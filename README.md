@@ -84,5 +84,4 @@ php verificar.php                                # pruebas automáticas: 57 de 5
 
 | Nombre | Rol |
 |Daniela Cayo| frontend|
-| | |
-| | |
+
