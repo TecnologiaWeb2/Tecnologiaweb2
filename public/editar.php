@@ -3,32 +3,36 @@
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
 
-$catalogo = new Catalogo();
+$pdo = Conexion::obtener();
+$repo = new ProductoRepositorio($pdo);
 $codigo = strtoupper(texto($_GET, 'codigo'));
-$actual = $catalogo->buscar($codigo);
+$actual = $repo->buscarPorCodigo($codigo);
 if ($actual === null) {
     http_response_code(404);
     exit('Prenda no encontrada');
 }
+$categorias = (new CategoriaRepositorio($pdo))->todas();
+// Socios activos + el socio actual de la prenda (aunque ya esté inactivo, debe poder conservarse)
+$socios = (new SocioRepositorio($pdo))->activos() + [$actual->socio->id => $actual->socio];
 $errores = [];
-$datos = $actual->aArreglo();
-$datos['precio'] = number_format($actual->precio, 2, ',', '');
+$datos = ['codigo' => $actual->codigo, 'nombre' => $actual->nombre, 'categoria' => $actual->categoria->id,
+    'socio' => (string) $actual->socio->id, 'precio' => number_format($actual->precio, 2, ',', ''), 'stock' => (string) $actual->stock,
+    'tallas' => array_map(fn(Talla $t): string => $t->value, $actual->tallas), 'color' => $actual->color, 'descripcion' => $actual->descripcion];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exigir_csrf($_POST);
     $foto = guardar_foto($_FILES);
     // El código no se cambia (codigoFijo) y, si no llegó foto nueva, se conserva la anterior
-    $resultado = validar_producto($_POST, $catalogo, codigoFijo: $codigo, foto: $foto['nombre'] ?? $actual->foto);
+    $resultado = validar_producto($_POST, $repo, $categorias, $socios, codigoFijo: $codigo, foto: $foto['nombre'] ?? $actual->foto);
     $errores = $resultado['errores'];
     if ($foto['error'] !== null) {
         $errores['foto'] = $foto['error'];
     }
     if ($errores === []) {
+        $repo->actualizar($resultado['producto']);
         if ($foto['nombre'] !== null) {
             borrar_foto($actual->foto);             // la foto vieja ya no se usa
         }
-        $catalogo->reemplazar($resultado['producto']);
-        $catalogo->guardar();
         redirigir('/admin.php?actualizado=' . urlencode($codigo));
     }
     borrar_foto($foto['nombre']);

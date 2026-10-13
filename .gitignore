@@ -1,3 +1,6 @@
+# Credenciales reales de la base de datos: nunca al repositorio (se usa config/config.ejemplo.php como plantilla)
+config/config.php
+
 # Datos locales: el repositorio solo lleva los datos de demostración (productos.inicial.json)
 datos/productos.json
 datos/fotos/*

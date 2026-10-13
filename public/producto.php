@@ -3,8 +3,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
 
-$catalogo = new Catalogo();
-$p = $catalogo->buscar(strtoupper(texto($_GET, 'codigo')));
+$p = (new ProductoRepositorio(Conexion::obtener()))->buscarPorCodigo(strtoupper(texto($_GET, 'codigo')));
 if ($p === null) {
     http_response_code(404);
     $titulo = 'Prenda no encontrada';
@@ -33,6 +32,7 @@ require __DIR__ . '/../plantillas/cabecera.php';
       <dt>Código</dt><dd><?= e($p->codigo) ?></dd>
       <dt>Tallas</dt><dd><?= e($p->tallasTexto()) ?></dd>
       <?php if ($p->color !== ''): ?><dt>Color</dt><dd><?= e($p->color) ?></dd><?php endif; ?>
+      <dt>Confeccionó</dt><dd><?= e($p->socio->nombre) ?> (<?= e($p->socio->comunidad) ?>)</dd>
       <dt>Disponibilidad</dt><dd><?= $p->disponible() ? $p->stock . ' unidades' : '<span class="insignia">Agotado</span>' ?></dd>
     </dl>
     <p><a href="/">← Volver a la tienda</a></p>

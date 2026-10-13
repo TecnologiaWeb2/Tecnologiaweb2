@@ -1,7 +1,0 @@
-[
-    { "id": "poleras", "nombre": "Poleras y blusas", "descripcion": "Prendas superiores de algodón y tocuyo." },
-    { "id": "pantalones", "nombre": "Pantalones y faldas", "descripcion": "Jeans, pantalones de tela y faldas." },
-    { "id": "vestidos", "nombre": "Vestidos", "descripcion": "Vestidos casuales y de fiesta con bordado chiquitano." },
-    { "id": "abrigos", "nombre": "Abrigos y chamarras", "descripcion": "Chamarras, chalecos y ponchos para el surazo." },
-    { "id": "accesorios", "nombre": "Accesorios", "descripcion": "Bolsos, sombreros y fajas tejidas." }
-]

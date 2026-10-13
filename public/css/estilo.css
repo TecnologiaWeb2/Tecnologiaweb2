@@ -77,3 +77,16 @@ button:hover { filter: brightness(1.1); }
 .en-linea { display: inline; }
 button.peligro { background: var(--peligro); padding: .2rem .6rem; }
 :focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+/* Actividad 2: barra de búsqueda, botones-enlace y paginación */
+.barra { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; justify-content: space-between; margin: 1rem 0; }
+.barra form { display: flex; gap: .5rem; flex-wrap: wrap; }
+.barra input[type="search"] { width: 16rem; }
+.barra select { width: auto; }
+.boton { display: inline-block; background: var(--acento); color: #fff; text-decoration: none; padding: .5rem 1rem; border-radius: .3rem; }
+.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.paginacion ul { list-style: none; display: flex; flex-wrap: wrap; gap: .3rem; padding: 0; margin: 1.5rem 0; justify-content: center; }
+.paginacion a, .paginacion span { display: inline-block; min-width: 2.4rem; text-align: center; padding: .4rem .7rem;
+  border: 1px solid var(--borde); border-radius: .3rem; background: var(--tarjeta); text-decoration: none; }
+.paginacion span[aria-current="page"] { background: var(--marca); color: #fff; border-color: var(--marca); font-weight: 700; }
+button[disabled] { opacity: .45; cursor: not-allowed; }

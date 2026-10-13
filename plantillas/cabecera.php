@@ -17,7 +17,8 @@ $seccion ??= '';
   <a class="marca" href="/"><?= e(NOMBRE_TIENDA) ?></a>
   <nav aria-label="Principal">
     <a href="/"<?= $seccion === 'tienda' ? ' aria-current="page"' : '' ?>>Tienda</a>
-    <a href="/admin.php"<?= $seccion === 'admin' ? ' aria-current="page"' : '' ?>>Gestión</a>
+    <a href="/admin.php"<?= $seccion === 'admin' ? ' aria-current="page"' : '' ?>>Prendas</a>
+    <a href="/socios.php"<?= $seccion === 'socios' ? ' aria-current="page"' : '' ?>>Socios</a>
     <a href="/nuevo.php"<?= $seccion === 'nuevo' ? ' aria-current="page"' : '' ?>>Nueva prenda</a>
   </nav>
 </header>

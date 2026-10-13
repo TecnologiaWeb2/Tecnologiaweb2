@@ -1,26 +1,8 @@
 <?php
 // plantillas/formulario.php — Formulario de prenda compartido por nuevo.php y editar.php (include).
-// Variables que debe definir la página: $catalogo, $accion, $datos, $errores, $editando (bool)
+// Variables que debe definir la página: $categorias, $socios, $accion, $datos, $errores, $editando (bool)
 declare(strict_types=1);
-
-/** Atributos de accesibilidad y mensaje de error de un campo. */
-function atributos_error(string $nombre, array $errores): string
-{
-    return isset($errores[$nombre]) ? " aria-invalid=\"true\" aria-describedby=\"f-$nombre-error\"" : '';
-}
-
-function mensaje_error(string $nombre, array $errores): string
-{
-    return isset($errores[$nombre]) ? "<span class=\"error\" id=\"f-$nombre-error\">" . e($errores[$nombre]) . '</span>' : '';
-}
-
-/** Campo de texto con etiqueta, valor anterior (escapado) y error asociado. */
-function campo(string $nombre, string $etiqueta, array $datos, array $errores, string $tipo = 'text', string $extra = ''): void
-{
-    echo "<p><label for=\"f-$nombre\">$etiqueta</label>"
-        . "<input id=\"f-$nombre\" name=\"$nombre\" type=\"$tipo\" value=\"" . e((string) ($datos[$nombre] ?? '')) . "\" $extra"
-        . atributos_error($nombre, $errores) . '>' . mensaje_error($nombre, $errores) . '</p>';
-}
+require_once __DIR__ . '/campos.php';
 ?>
 <?php if ($errores !== []): ?>
   <p class="alerta" role="alert">Revisa <?= count($errores) === 1 ? 'el campo marcado' : 'los ' . count($errores) . ' campos marcados' ?>.</p>
@@ -34,11 +16,21 @@ function campo(string $nombre, string $etiqueta, array $datos, array $errores, s
     <label for="f-categoria">Categoría</label>
     <select id="f-categoria" name="categoria" required<?= atributos_error('categoria', $errores) ?>>
       <option value="">— elegir —</option>
-      <?php foreach ($catalogo->categorias() as $c): ?>
+      <?php foreach ($categorias as $c): ?>
         <option value="<?= e($c->id) ?>"<?= ($datos['categoria'] ?? '') === $c->id ? ' selected' : '' ?>><?= e($c->nombre) ?></option>
       <?php endforeach; ?>
     </select>
     <?= mensaje_error('categoria', $errores) ?>
+  </p>
+  <p>
+    <label for="f-socio">Confeccionada por</label>
+    <select id="f-socio" name="socio" required<?= atributos_error('socio', $errores) ?>>
+      <option value="">— elegir socio —</option>
+      <?php foreach ($socios as $s): ?>
+        <option value="<?= $s->id ?>"<?= ($datos['socio'] ?? '') === (string) $s->id ? ' selected' : '' ?>><?= e($s->nombre) ?> · <?= e($s->comunidad) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <?= mensaje_error('socio', $errores) ?>
   </p>
   <?php campo('precio', 'Precio (Bs)', $datos, $errores, 'text', 'inputmode="decimal" required'); ?>
   <?php campo('stock', 'Stock (unidades)', $datos, $errores, 'number', 'min="0" step="1" required'); ?>

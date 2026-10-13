@@ -68,3 +68,27 @@ function exigir_metodo(string ...$permitidos): void
         exit('Método no permitido');
     }
 }
+
+// ---------- Paginación ----------
+
+/**
+ * Navegación «Anterior 1 2 3 Siguiente» que conserva los filtros actuales en la URL.
+ * @param array<string, mixed> $parametros filtros GET a conservar (los vacíos se omiten)
+ */
+function paginacion(Pagina $p, string $ruta, array $parametros = []): string
+{
+    if ($p->paginas() <= 1) {
+        return '';
+    }
+    $parametros = array_filter($parametros, fn(mixed $v): bool => $v !== '' && $v !== null && $v !== false);
+    $url = fn(int $n): string => e($ruta . '?' . http_build_query($parametros + ['pagina' => $n]));
+    $html = '<nav class="paginacion" aria-label="Paginación"><ul>';
+    $html .= $p->hayAnterior() ? '<li><a href="' . $url($p->pagina - 1) . '" rel="prev">← Anterior</a></li>' : '';
+    for ($n = 1; $n <= $p->paginas(); $n++) {
+        $html .= $n === $p->pagina
+            ? "<li><span aria-current=\"page\">$n</span></li>"
+            : '<li><a href="' . $url($n) . '">' . $n . '</a></li>';
+    }
+    $html .= $p->haySiguiente() ? '<li><a href="' . $url($p->pagina + 1) . '" rel="next">Siguiente →</a></li>' : '';
+    return $html . '</ul></nav>';
+}

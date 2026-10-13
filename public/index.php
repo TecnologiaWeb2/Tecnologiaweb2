@@ -1,20 +1,33 @@
 <?php
-// public/index.php — Vitrina de la tienda: filtros por GET (texto, categoría, talla, disponibilidad y orden).
+// public/index.php — Vitrina de la tienda: filtros por GET (texto, categoría, talla, disponibilidad, orden) y paginación.
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
 
-$catalogo = new Catalogo();
+const POR_PAGINA = 8;
+$pdo = Conexion::obtener();
+$categorias = (new CategoriaRepositorio($pdo))->todas();
+$conteo = (new CategoriaRepositorio($pdo))->conteoProductos();
+
 $q = texto($_GET, 'q');
 $categoria = texto($_GET, 'categoria');
 $talla = Talla::tryFrom(texto($_GET, 'talla'));
-$orden = array_key_exists(texto($_GET, 'orden'), Catalogo::ORDENES) ? texto($_GET, 'orden') : 'nombre';
+$orden = array_key_exists(texto($_GET, 'orden'), ProductoRepositorio::ORDENES) ? texto($_GET, 'orden') : 'nombre';
 $soloDisponibles = texto($_GET, 'disponibles') === '1';
-if ($catalogo->categoria($categoria) === null) {
+if (!isset($categorias[$categoria])) {
     $categoria = '';                                  // una categoría inventada en la URL se ignora
 }
 
-$productos = $catalogo->filtrar(texto: $q, categoria: $categoria, talla: $talla, soloDisponibles: $soloDisponibles, orden: $orden);
-$conteo = $catalogo->conteoPorCategoria();
+$resultado = (new ProductoRepositorio($pdo))->paginar(
+    pagina: (int) filter_var(texto($_GET, 'pagina', '1'), FILTER_VALIDATE_INT, ['options' => ['default' => 1]]),
+    porPagina: POR_PAGINA,
+    texto: $q,
+    categoria: $categoria,
+    talla: $talla,
+    soloDisponibles: $soloDisponibles,
+    orden: $orden,
+);
+$filtros = ['q' => $q, 'categoria' => $categoria, 'talla' => $talla?->value, 'orden' => $orden === 'nombre' ? '' : $orden,
+    'disponibles' => $soloDisponibles ? '1' : ''];
 
 $titulo = 'Tienda';
 $seccion = 'tienda';
@@ -26,13 +39,13 @@ require __DIR__ . '/../plantillas/cabecera.php';
 </section>
 
 <form method="get" action="/" class="filtros" role="search">
-  <p><label for="q">Buscar</label><input id="q" name="q" type="search" value="<?= e($q) ?>" placeholder="jean, bordado, azul…"></p>
+  <p><label for="q">Buscar</label><input id="q" name="q" type="search" value="<?= e($q) ?>" placeholder="jean, bordado, azul…" maxlength="60"></p>
   <p>
     <label for="categoria">Categoría</label>
     <select id="categoria" name="categoria">
       <option value="">Todas</option>
-      <?php foreach ($catalogo->categorias() as $c): ?>
-        <option value="<?= e($c->id) ?>"<?= $categoria === $c->id ? ' selected' : '' ?>><?= e($c->nombre) ?> (<?= $conteo[$c->id] ?>)</option>
+      <?php foreach ($categorias as $c): ?>
+        <option value="<?= e($c->id) ?>"<?= $categoria === $c->id ? ' selected' : '' ?>><?= e($c->nombre) ?> (<?= $conteo[$c->id] ?? 0 ?>)</option>
       <?php endforeach; ?>
     </select>
   </p>
@@ -48,7 +61,7 @@ require __DIR__ . '/../plantillas/cabecera.php';
   <p>
     <label for="orden">Ordenar por</label>
     <select id="orden" name="orden">
-      <?php foreach (Catalogo::ORDENES as $clave => $etiqueta): ?>
+      <?php foreach (ProductoRepositorio::ORDENES as $clave => $etiqueta): ?>
         <option value="<?= e($clave) ?>"<?= $orden === $clave ? ' selected' : '' ?>><?= e($etiqueta) ?></option>
       <?php endforeach; ?>
     </select>
@@ -57,13 +70,16 @@ require __DIR__ . '/../plantillas/cabecera.php';
   <p><button type="submit">Filtrar</button> <a href="/">Limpiar</a></p>
 </form>
 
-<p class="resumen" role="status"><?= count($productos) ?> <?= count($productos) === 1 ? 'prenda' : 'prendas' ?><?= $q !== '' ? ' para «' . e($q) . '»' : '' ?></p>
+<p class="resumen" role="status">
+  <?= $resultado->total ?> <?= $resultado->total === 1 ? 'prenda' : 'prendas' ?><?= $q !== '' ? ' para «' . e($q) . '»' : '' ?>
+  <?php if ($resultado->paginas() > 1): ?> · mostrando <?= $resultado->desde() ?>–<?= $resultado->hasta() ?><?php endif; ?>
+</p>
 
-<?php if ($productos === []): ?>
+<?php if ($resultado->elementos === []): ?>
   <p class="vacio">No encontramos prendas con esos filtros.</p>
 <?php else: ?>
 <ul class="grilla">
-  <?php foreach ($productos as $p): ?>
+  <?php foreach ($resultado->elementos as $p): ?>
     <li class="tarjeta<?= $p->disponible() ? '' : ' agotado' ?>">
       <a href="/producto.php?codigo=<?= urlencode($p->codigo) ?>">
         <?php if ($p->foto !== null): ?>
@@ -81,4 +97,5 @@ require __DIR__ . '/../plantillas/cabecera.php';
   <?php endforeach; ?>
 </ul>
 <?php endif; ?>
+<?= paginacion($resultado, '/', $filtros) ?>
 <?php require __DIR__ . '/../plantillas/pie.php'; ?>
