@@ -1,0 +1,11 @@
+# Datos locales: el repositorio solo lleva los datos de demostración (productos.inicial.json)
+datos/productos.json
+datos/fotos/*
+!datos/fotos/.gitkeep
+datos/*.tmp
+
+# Archivos temporales de Office y del sistema
+~$*
+.DS_Store
+Thumbs.db
+.vscode/

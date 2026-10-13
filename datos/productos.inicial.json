@@ -1,0 +1,79 @@
+[
+    {
+        "codigo": "POL-001",
+        "nombre": "Polera de algodón con bordado de tajibo",
+        "categoria": "poleras",
+        "precio": 95.0,
+        "stock": 24,
+        "tallas": ["S", "M", "L", "XL"],
+        "color": "Blanco",
+        "descripcion": "Algodón peinado 100 %, bordado a mano por socias de Concepción.",
+        "foto": null
+    },
+    {
+        "codigo": "POL-002",
+        "nombre": "Blusa de tocuyo manga corta",
+        "categoria": "poleras",
+        "precio": 120.0,
+        "stock": 0,
+        "tallas": ["XS", "S", "M"],
+        "color": "Crudo",
+        "descripcion": "Tela de tocuyo tradicional, fresca para el calor del oriente.",
+        "foto": null
+    },
+    {
+        "codigo": "PAN-010",
+        "nombre": "Jean clásico tiro alto",
+        "categoria": "pantalones",
+        "precio": 180.0,
+        "stock": 15,
+        "tallas": ["S", "M", "L"],
+        "color": "Azul",
+        "descripcion": "Mezclilla de 12 onzas con costuras reforzadas.",
+        "foto": null
+    },
+    {
+        "codigo": "PAN-011",
+        "nombre": "Falda plisada de lino",
+        "categoria": "pantalones",
+        "precio": 140.5,
+        "stock": 7,
+        "tallas": ["S", "M"],
+        "color": "Terracota",
+        "descripcion": "",
+        "foto": null
+    },
+    {
+        "codigo": "VES-100",
+        "nombre": "Vestido tipoy bordado",
+        "categoria": "vestidos",
+        "precio": 350.0,
+        "stock": 5,
+        "tallas": ["S", "M", "L"],
+        "color": "Blanco",
+        "descripcion": "Inspirado en el tipoy chiquitano, bordado en punto cruz.",
+        "foto": null
+    },
+    {
+        "codigo": "ABR-200",
+        "nombre": "Chamarra de jean forrada",
+        "categoria": "abrigos",
+        "precio": 260.0,
+        "stock": 9,
+        "tallas": ["M", "L", "XL", "XXL"],
+        "color": "Azul",
+        "descripcion": "Forro de chiporro para los días de surazo.",
+        "foto": null
+    },
+    {
+        "codigo": "ACC-300",
+        "nombre": "Bolso tejido de saó",
+        "categoria": "accesorios",
+        "precio": 75.0,
+        "stock": 30,
+        "tallas": ["U"],
+        "color": "Natural",
+        "descripcion": "Tejido a mano con fibra de saó.",
+        "foto": null
+    }
+]
