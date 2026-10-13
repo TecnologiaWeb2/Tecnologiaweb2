@@ -9,7 +9,7 @@ const TAM_MAXIMO = 2 * 1024 * 1024;                   // 2 MB
 const TIPOS_PERMITIDOS = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
 const NOMBRE_TIENDA = 'Manos del Oriente';
 const NOMBRE_ASOCIACION = 'Asociación de Confeccionistas Textiles «Manos del Oriente»';
-const REPOSITORIO_GITHUB = 'https://github.com/dah0404/Tecnologiaweb2';
+const REPOSITORIO_GITHUB = 'https://github.com/TecnologiaWeb2/Tecnologiaweb2';
 
 /**
  * Datos de conexión: config/config.php (fuera de public/ y fuera del repositorio) o, si no existe, la plantilla.

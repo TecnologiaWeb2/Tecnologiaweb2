@@ -62,7 +62,7 @@ $v->revisar('Las claves foráneas rechazan una prenda con un socio inexistente',
     }
 });
 $v->revisar('La conexión PDO usa excepciones y consultas preparadas reales (sin emulación)', fn() =>
-    $pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION && $pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES) === false);
+    $pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION && !$pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES)); // PHP 8.3 devuelve 0; 8.4, false
 $v->revisar('La configuración de la conexión vive fuera de public/ (config/) y config.php no se sube a git', fn() =>
     is_file(__DIR__ . '/config/config.ejemplo.php') && !is_file(__DIR__ . '/public/config.php')
     && str_contains((string) file_get_contents(__DIR__ . '/.gitignore'), 'config/config.php'));

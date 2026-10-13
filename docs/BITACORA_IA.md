@@ -1,6 +1,6 @@
 # Bitácora de uso de IA: proyecto «Manos del Oriente»
 
-**Integrantes:** _(completar)_  **Herramienta:** Claude Code (modelo Claude Opus 5.5)  **Repositorio:** https://github.com/dah0404/Tecnologiaweb2
+**Integrantes:** _(completar)_  **Herramienta:** Claude Code (modelo Claude Opus 5.5)  **Repositorio:** https://github.com/TecnologiaWeb2/Tecnologiaweb2
 
 > Esta bitácora registra, para TODO el proyecto, qué se pidió a la IA, qué entregó, cómo se verificó y qué decidimos
 > nosotros. Complétenla con sus palabras: el docente evalúa su criterio, no solo el código.
