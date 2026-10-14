@@ -103,7 +103,7 @@ Diseño con **Bootstrap 5** y una paleta pastel de tienda de moda (crema, rosa e
 | Nombre | GitHub | Rol |
 |---|---|---|
 | Daniela Cayo Mamani | dah0404 | frontend |
-| Juan Jose Vicente | JUANJOVICO2021 | backend |
+| Juan Jose Vicente Cossio | JUANJOVICO2021 | backend |
+| Ronald Salvatierra Flores | RonSalvet | |
 | Yordy Tolavi Ruiz | tolavi | backend |
-| _(completar)_ | RonSalvet | |
-| _(completar)_ | leinn04 | |
+| Alejandro Cadario Lopez | leinn04 | |
