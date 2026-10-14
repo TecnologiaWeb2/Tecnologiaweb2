@@ -82,7 +82,10 @@ php verificar.php                                # pruebas automáticas: 57 de 5
 
 ## Integrantes
 
-| Nombre | Rol |
-|Daniela Cayo| frontend|
-|Juan Jose Vicente| backend|
-|yordy tolavi ruiz| backend|
+| Nombre | GitHub | Rol |
+|---|---|---|
+| Daniela Cayo Mamani | dah0404 | frontend |
+| Juan Jose Vicente | JUANJOVICO2021 | backend |
+| Yordy Tolavi Ruiz | tolavi | backend |
+| _(completar)_ | RonSalvet | |
+| _(completar)_ | leinn04 | |
