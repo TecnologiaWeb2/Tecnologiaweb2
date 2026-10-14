@@ -85,4 +85,4 @@ php verificar.php                                # pruebas automáticas: 57 de 5
 | Nombre | Rol |
 |Daniela Cayo| frontend|
 |Juan Jose Vicente| backend|
-
+|yordy tolavi ruiz| backend|
