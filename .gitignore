@@ -12,3 +12,6 @@ datos/*.tmp
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Configuración local del editor
+*.code-workspace

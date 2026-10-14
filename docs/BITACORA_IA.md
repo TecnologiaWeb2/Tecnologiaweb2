@@ -1,6 +1,7 @@
 # Bitácora de uso de IA: proyecto «Manos del Oriente»
 
-**Integrantes:** _(completar)_  **Herramienta:** Claude Code (modelo Claude Opus 5.5)  **Repositorio:** https://github.com/TecnologiaWeb2/Tecnologiaweb2
+**Integrantes:** Daniela Cayo Mamani (dah0404) · _(nombre completo)_ (RonSalvet) · _(nombre completo)_ (tolavi) · _(nombre completo)_ (JUANJOVICO2021) · _(nombre completo)_ (leinn04)
+**Docente:** M.Sc. Ing. Jimmy Nataniel Requena Llorentty  **Herramienta:** Claude Code (modelo Claude Opus 5.5)  **Repositorio:** https://github.com/TecnologiaWeb2/Tecnologiaweb2
 
 > Esta bitácora registra, para TODO el proyecto, qué se pidió a la IA, qué entregó, cómo se verificó y qué decidimos
 > nosotros. Complétenla con sus palabras: el docente evalúa su criterio, no solo el código.
@@ -28,7 +29,8 @@
 | 12 | Demostrar resistencia a inyección SQL | 13 pruebas de ataques (`' OR '1'='1`, `UNION`, `DROP TABLE`, `ORDER BY` malicioso, `%`) + revisión automática del código fuente + `docs/actividad-02/INYECCION_SQL.md` | Todas en verde; las tablas siguen intactas después de cada ataque | |
 | 13 | Errores de la IA en sus propias pruebas | Esperaba 5 claves foráneas (son 4); suponía que el id de una prenda nueva sería 15 (un INSERT fallido por FK ya había consumido el autoincremento); enviaba «saó» sin codificar en la URL; esperaba 404 en `/../config/...` (el servidor embebido devuelve la página de inicio) | Investigué cada caso: ninguno era un error de la aplicación; se corrigieron las pruebas (la última ahora comprueba que **no se filtra el contenido**) | Lección: una prueba que falla puede estar mal escrita; hay que entender la causa antes de «arreglar» |
 | 14 | Migración de los datos de la actividad 1 | `bd/migrar_json.php` con transacción y modo `--simular` | Simulación: 7 prendas omitidas (ya existían) y 1 nueva | |
-| 15 | Ejecutar en el Docker del curso, organizar el trabajo en un tablero de sprint y documentar en APA 7 con el modelo del docente | Contenedores MySQL 8.4 + PHP 8.3; organización `TecnologiaWeb2` con el tablero «Manos del Oriente Board» (27 issues); capturas automáticas; informes de las actividades 1 y 2 con la maqueta del PDF modelo | En PHP 8.3 salió 56/57: `ATTR_EMULATE_PREPARES` devuelve `0` (en 8.4, `false`); se corrigió la prueba → 57/57. Revisé cada página de los informes exportados a PDF | _(completar nombres, carrera y docente en las portadas)_ |
+| 15 | Ejecutar en el Docker del curso, organizar el trabajo en un tablero de sprint y documentar en APA 7 con el modelo del docente | Contenedores MySQL 8.4 + PHP 8.3; organización `TecnologiaWeb2` con el tablero «Manos del Oriente Board» (27 issues); capturas automáticas; informes de las actividades 1 y 2 con la maqueta del PDF modelo | En PHP 8.3 salió 56/57: `ATTR_EMULATE_PREPARES` devuelve `0` (en 8.4, `false`); se corrigió la prueba → 57/57. Revisé cada página de los informes exportados a PDF | Portadas: carrera y docente completados; faltan los nombres de 4 integrantes |
+| 16 | Cierre de las actividades 1 y 2: repartir el trabajo pendiente entre los 5 integrantes, completar portadas y crear el video de 60 s de la Actividad 1 | Issues #28–#31 asignados (video, revisión del informe, guion de la defensa, demostración en vivo) y las tareas de las actividades 3–4 y del proyecto final repartidas; video de 60 s armado con capturas reales de la aplicación (registro con foto, filtros, validación 422 y las 33 pruebas) y exportado con PowerPoint | Con el proyecto movido a `DanielaTW2\Proyecto`, las pruebas siguieron en verde: 33/33 (act. 1) y 57/57 (act. 2); la duración del video se comprobó en las propiedades del archivo (1:00) | El video no tiene narración: si el grupo prefiere, se graba una versión con voz (issue #28) |
 
 ## Reflexión (completar)
 

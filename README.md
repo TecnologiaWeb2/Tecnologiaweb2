@@ -55,7 +55,7 @@ php verificar.php                                # pruebas automáticas: 57 de 5
 ├── plantillas/                 cabecera, pie, campos y formularios (require)
 ├── docs/
 │   ├── BITACORA_IA.md          bitácora de IA de todo el proyecto
-│   ├── actividad-01/           informe APA, presentación y capturas
+│   ├── actividad-01/           informe APA, presentación, video de 60 s y capturas
 │   └── actividad-02/           MODELO_ER.md, INYECCION_SQL.md, informe y presentación
 ├── Verificador.php             motor de pruebas de la asignatura
 └── verificar.php               57 comprobaciones (BD, repositorios, web, inyección SQL)
