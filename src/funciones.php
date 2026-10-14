@@ -21,6 +21,18 @@ function texto(array $origen, string $clave, string $porDefecto = ''): string
     return is_string($valor) ? trim($valor) : $porDefecto;
 }
 
+/** Guarda un aviso que plantillas/pie.php muestra como toast en la esquina superior derecha. $tipo: 'exito' o 'error'. */
+function avisar(string $mensaje, string $tipo = 'exito'): void
+{
+    $GLOBALS['avisos'][] = ['mensaje' => $mensaje, 'tipo' => $tipo];
+}
+
+/** true si la página se pidió desde un modal (public/js/app.js envía X-Parcial: 1): se devuelve solo el contenido. */
+function es_parcial(): bool
+{
+    return ($_SERVER['HTTP_X_PARCIAL'] ?? '') === '1';
+}
+
 /** Redirige con 303 (patrón PRG: después de un POST, el navegador hace un GET). */
 function redirigir(string $url): never
 {
@@ -82,13 +94,13 @@ function paginacion(Pagina $p, string $ruta, array $parametros = []): string
     }
     $parametros = array_filter($parametros, fn(mixed $v): bool => $v !== '' && $v !== null && $v !== false);
     $url = fn(int $n): string => e($ruta . '?' . http_build_query($parametros + ['pagina' => $n]));
-    $html = '<nav class="paginacion" aria-label="Paginación"><ul>';
-    $html .= $p->hayAnterior() ? '<li><a href="' . $url($p->pagina - 1) . '" rel="prev">← Anterior</a></li>' : '';
+    $html = '<nav class="paginacion mt-4" aria-label="Paginación"><ul class="pagination justify-content-center">';
+    $html .= $p->hayAnterior() ? '<li class="page-item"><a class="page-link" href="' . $url($p->pagina - 1) . '" rel="prev">← Anterior</a></li>' : '';
     for ($n = 1; $n <= $p->paginas(); $n++) {
         $html .= $n === $p->pagina
-            ? "<li><span aria-current=\"page\">$n</span></li>"
-            : '<li><a href="' . $url($n) . '">' . $n . '</a></li>';
+            ? "<li class=\"page-item active\"><span class=\"page-link\" aria-current=\"page\">$n</span></li>"
+            : '<li class="page-item"><a class="page-link" href="' . $url($n) . '">' . $n . '</a></li>';
     }
-    $html .= $p->haySiguiente() ? '<li><a href="' . $url($p->pagina + 1) . '" rel="next">Siguiente →</a></li>' : '';
+    $html .= $p->haySiguiente() ? '<li class="page-item"><a class="page-link" href="' . $url($p->pagina + 1) . '" rel="next">Siguiente →</a></li>' : '';
     return $html . '</ul></nav>';
 }

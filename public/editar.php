@@ -44,10 +44,13 @@ $titulo = 'Editar ' . $codigo;
 $seccion = 'admin';
 $accion = '/editar.php?codigo=' . urlencode($codigo);
 $editando = true;
+$fotoActual = $actual->foto;
 require __DIR__ . '/../plantillas/cabecera.php';
-echo '<h1>Editar ' . e($codigo) . '</h1>';
-if ($actual->foto !== null) {
-    echo '<p><img src="/foto.php?f=' . e($actual->foto) . '" alt="Foto actual de ' . e($actual->nombre) . '" width="160" height="160"></p>';
+if (!es_parcial()) {
+    echo '<div class="card shadow-sm border-0 mx-auto formulario-pagina"><div class="card-body p-4"><h1 class="h4 mb-4">' . e('Editar ' . $codigo) . '</h1>';
 }
 require __DIR__ . '/../plantillas/formulario.php';
+if (!es_parcial()) {
+    echo '</div></div>';
+}
 require __DIR__ . '/../plantillas/pie.php';

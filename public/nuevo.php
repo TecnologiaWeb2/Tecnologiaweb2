@@ -36,6 +36,11 @@ $seccion = 'nuevo';
 $accion = '/nuevo.php';
 $editando = false;
 require __DIR__ . '/../plantillas/cabecera.php';
-echo '<h1>Registrar prenda</h1>';
+if (!es_parcial()) {
+    echo '<div class="card shadow-sm border-0 mx-auto formulario-pagina"><div class="card-body p-4"><h1 class="h4 mb-4">' . e('Registrar prenda') . '</h1>';
+}
 require __DIR__ . '/../plantillas/formulario.php';
+if (!es_parcial()) {
+    echo '</div></div>';
+}
 require __DIR__ . '/../plantillas/pie.php';

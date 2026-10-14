@@ -38,7 +38,10 @@ php verificar.php                                # pruebas automáticas: 57 de 5
 │   ├── admin.php               gestión de prendas: búsqueda, paginación (10), resumen del inventario
 │   ├── nuevo.php / editar.php / eliminar.php        CRUD de prendas (POST + CSRF + PRG)
 │   ├── socios.php / socio_form.php / socio_eliminar.php   CRUD de socios (paginación de 5)
-│   └── foto.php                entrega fotos guardadas fuera de public/
+│   ├── foto.php                entrega fotos guardadas fuera de public/
+│   ├── css/estilo.css          paleta pastel de la tienda sobre Bootstrap 5
+│   ├── js/app.js               modales (ver, registrar, editar), confirmación al eliminar y avisos
+│   └── vendor/                 Bootstrap 5.3.3, Bootstrap Icons y fuentes (locales: funciona sin internet)
 ├── config/config.ejemplo.php   plantilla de conexión (config.php real: fuera de public/ y de git)
 ├── bd/
 │   ├── esquema.sql             5 tablas InnoDB, claves foráneas, UNIQUE y CHECK
@@ -52,14 +55,29 @@ php verificar.php                                # pruebas automáticas: 57 de 5
 │   ├── Repositorio/            ProductoRepositorio, SocioRepositorio, CategoriaRepositorio, Pagina
 │   ├── validacion.php          validar_producto(), validar_socio()
 │   ├── fotos.php / funciones.php
-├── plantillas/                 cabecera, pie, campos y formularios (require)
+├── plantillas/                 cabecera, pie (avisos y modales), campos y formularios (require)
 ├── docs/
 │   ├── BITACORA_IA.md          bitácora de IA de todo el proyecto
+│   ├── interfaz/               capturas del diseño actual (modales, avisos, versión móvil)
 │   ├── actividad-01/           informe APA, presentación, video de 60 s y capturas
 │   └── actividad-02/           MODELO_ER.md, INYECCION_SQL.md, informe y presentación
 ├── Verificador.php             motor de pruebas de la asignatura
 └── verificar.php               57 comprobaciones (BD, repositorios, web, inyección SQL)
 ```
+
+## Interfaz
+
+Diseño con **Bootstrap 5** y una paleta pastel de tienda de moda (crema, rosa empolvado, lavanda y menta).
+
+- **Ver el detalle, registrar y editar** se hacen en un **modal**, sin salir de la lista. Si hay errores de validación, se muestran dentro del mismo modal.
+- **Eliminar** pide confirmación en un modal y el resultado aparece como **aviso en la esquina superior derecha** (toast).
+- **Mejora progresiva:** `public/js/app.js` pide las mismas páginas (`nuevo.php`, `editar.php`, `producto.php`, `socio_form.php`) con la cabecera `X-Parcial: 1` y el servidor devuelve solo su contenido. Sin JavaScript, todo funciona como páginas normales, con la misma validación, CSRF y PRG.
+
+| Tienda | Detalle en modal | Registro con validación |
+|---|---|---|
+| ![Tienda](docs/interfaz/01_tienda.png) | ![Detalle](docs/interfaz/02_detalle_modal.png) | ![Registro](docs/interfaz/03_registro_modal_validacion.png) |
+| **Confirmar eliminación** | **Aviso en la esquina** | **Versión móvil** |
+| ![Confirmar](docs/interfaz/05_confirmar_eliminar.png) | ![Aviso](docs/interfaz/06_aviso_esquina.png) | ![Móvil](docs/interfaz/08_movil.png) |
 
 ## Actividad 2: requisitos y dónde se cumplen
 
