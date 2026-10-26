@@ -1,0 +1,55 @@
+# E08 · POST con token → 201 Created + Location
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> Get-Content producto.json
+{
+    "codigo": "POL-050",
+    "nombre": "Polera de lino con bordado de cusi",
+    "categoria": "poleras",
+    "socio_id": 1,
+    "precio": "110.00",
+    "stock": 6,
+    "tallas": ["S", "M", "L"],
+    "color": "Blanco",
+    "descripcion": "Lino natural, bordado a mano."
+}
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X POST "http://127.0.0.1:8010/api/v1/productos" -H "Authorization: Bearer $TOKEN" --data-binary "@producto.json"   # $TOKEN = token de operador (oculto)
+HTTP/1.1 201 Created
+Cache-Control: no-store
+Location: /api/v1/productos/POL-050
+Content-Type: application/json; charset=UTF-8
+(respuesta: 632 bytes en 48 ms)
+
+{
+    "codigo": "POL-050",
+    "nombre": "Polera de lino con bordado de cusi",
+    "categoria": {
+        "id": "poleras",
+        "nombre": "Poleras y blusas"
+    },
+    "precio": "110.00",
+    "stock": 6,
+    "reservado": 0,
+    "disponible": 6,
+    "tallas": [
+        "S",
+        "M",
+        "L"
+    ],
+    "color": "Blanco",
+    "descripcion": "Lino natural, bordado a mano.",
+    "foto": null,
+    "socio": {
+        "id": 1,
+        "nombre": "Rosa Chuvé Supepí",
+        "comunidad": "Concepción"
+    },
+    "enlaces": {
+        "self": "/api/v1/productos/POL-050",
+        "web": "/producto.php?codigo=POL-050"
+    }
+}

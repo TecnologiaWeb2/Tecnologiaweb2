@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pedido válido de la Boutique Chiquitana (Santa Cruz de la Sierra) -->
+<pedido numero="BC-2026-0412">
+  <cliente>Boutique Chiquitana</cliente>
+  <fecha>2026-10-24</fecha>
+  <linea codigo="POL-001" cantidad="4"/>
+  <linea codigo="ACC-300" cantidad="6"/>
+</pedido>

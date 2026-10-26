@@ -1,0 +1,50 @@
+# E05 · Canal RSS 2.0 (title, description, guid, pubDate DATE_RSS)
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> curl.exe -i "http://127.0.0.1:8010/noticias.rss"
+HTTP/1.1 200 OK
+Content-Type: application/rss+xml; charset=UTF-8
+Cache-Control: public, max-age=300
+(respuesta: 3549 bytes en 37 ms)
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+ <channel>
+  <title>Manos del Oriente · Novedades</title>
+  <link>http://127.0.0.1:8010/</link>
+  <description>Prendas nuevas confeccionadas por las socias de Asociación de Confeccionistas Textiles «Manos del Oriente».</description>
+  <language>es-BO</language>
+  <lastBuildDate>Mon, 26 Oct 2026 14:58:33 -0400</lastBuildDate>
+  <item>
+   <title>Nueva prenda: Faja tejida tradicional</title>
+   <link>http://127.0.0.1:8010/producto.php?codigo=ACC-302</link>
+   <description>Accesorios · Bs 45,50</description>
+   <guid isPermaLink="false">manos-del-oriente:ACC-302</guid>
+   <pubDate>Mon, 26 Oct 2026 14:58:31 -0400</pubDate>
+  </item>
+  <item>
+   <title>Nueva prenda: Sombrero de saó</title>
+   <link>http://127.0.0.1:8010/producto.php?codigo=ACC-301</link>
+   <description>Accesorios · Bs 90,00</description>
+   <guid isPermaLink="false">manos-del-oriente:ACC-301</guid>
+   <pubDate>Mon, 26 Oct 2026 14:58:31 -0400</pubDate>
+  </item>
+  <item>
+   <title>Nueva prenda: Bolso tejido de saó</title>
+   <link>http://127.0.0.1:8010/producto.php?codigo=ACC-300</link>
+   <description>Accesorios · Bs 75,00</description>
+   <guid isPermaLink="false">manos-del-oriente:ACC-300</guid>
+   <pubDate>Mon, 26 Oct 2026 14:58:31 -0400</pubDate>
+  </item>
+  <item>
+   <title>Nueva prenda: Chaleco bordado de bayeta</title>
+   <link>http://127.0.0.1:8010/producto.php?codigo=ABR-202</link>
+   <description>Abrigos y chamarras · Bs 195,00</description>
+   <guid isPermaLink="false">manos-del-oriente:ABR-202</guid>
+   <pubDate>Mon, 26 Oct 2026 14:58:31 -0400</pubDate>
+  </item>
+  <item>
+   <title>Nueva prenda: Poncho tejido de lana</title>
+   <link>http://127.0.0.1:8010/producto.php?codigo=ABR-201</link>
+   <description>Abrigos y chamarras · Bs 310,00</description>
+… (41 líneas más)

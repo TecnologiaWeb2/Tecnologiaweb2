@@ -1,0 +1,54 @@
+# E09 · PUT → 200 (precio, stock y tallas reemplazados)
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> Get-Content actualizacion.json
+{
+    "nombre": "Polera de lino con bordado de cusi",
+    "categoria": "poleras",
+    "socio_id": 1,
+    "precio": "120.00",
+    "stock": 10,
+    "tallas": ["S", "M", "L", "XL"],
+    "color": "Blanco",
+    "descripcion": "Lino natural, bordado a mano. Nueva talla XL."
+}
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X PUT "http://127.0.0.1:8010/api/v1/productos/POL-050" -H "Authorization: Bearer $TOKEN" --data-binary "@actualizacion.json"   # $TOKEN = token de operador (oculto)
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Type: application/json; charset=UTF-8
+(respuesta: 664 bytes en 55 ms)
+
+{
+    "codigo": "POL-050",
+    "nombre": "Polera de lino con bordado de cusi",
+    "categoria": {
+        "id": "poleras",
+        "nombre": "Poleras y blusas"
+    },
+    "precio": "120.00",
+    "stock": 10,
+    "reservado": 0,
+    "disponible": 10,
+    "tallas": [
+        "S",
+        "M",
+        "L",
+        "XL"
+    ],
+    "color": "Blanco",
+    "descripcion": "Lino natural, bordado a mano. Nueva talla XL.",
+    "foto": null,
+    "socio": {
+        "id": 1,
+        "nombre": "Rosa Chuvé Supepí",
+        "comunidad": "Concepción"
+    },
+    "enlaces": {
+        "self": "/api/v1/productos/POL-050",
+        "web": "/producto.php?codigo=POL-050"
+    }
+}

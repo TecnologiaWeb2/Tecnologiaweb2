@@ -1,0 +1,13 @@
+✅ RSS en la interfaz: 5 novedades leídas con DOMParser
+✅ Autocompletar: aparece la lista (role=option) y aria-expanded=true
+✅ Flechas: aria-activedescendant apunta a la opción con aria-selected=true
+✅ Escape cierra la lista y reinicia la selección
+✅ AbortController: con red lenta las búsquedas viejas se cancelan y gana «jean»
+✅ Orden por precio (mayor a menor) y paginación por fetch, sin recargar la página
+✅ Los errores de la API (problem+json) se muestran en un aviso role=alert
+✅ Validación en vivo: «abc» formato local · POL-001 ocupado (200) · POL-999 disponible (404)
+✅ Importar XML inválido muestra el motivo del rechazo (XSD)
+✅ Operador: menú sin Usuarios ni Tokens y /usuarios.php → 403
+✅ Socia: entra directo a «Mi liquidación» y solo ve la suya
+✅ Sin errores de JavaScript ni violaciones de CSP en la consola
+Resultado navegador: 12 de 12

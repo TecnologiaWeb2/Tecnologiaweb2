@@ -34,6 +34,34 @@
 | 17 | Mejorar el diseño: Bootstrap 5, modales para ver, registrar y editar, confirmación y avisos en la esquina al eliminar, y una paleta pastel de tienda de ropa | Bootstrap 5.3.3 e íconos guardados en el proyecto (sin depender de internet); `public/js/app.js` carga las páginas reales dentro del modal con `X-Parcial: 1`; avisos con `avisar()`; paleta crema, rosa empolvado, lavanda y menta | Prueba de punta a punta con Edge automatizado: detalle, registro con errores dentro del modal, registro, edición y eliminación con aviso; `verificar.php` siguió en 57/57. **La prueba encontró un error previo:** la sesión con el token CSRF se iniciaba a mitad del HTML y su cookie no llegaba, así que eliminar desde la gestión daba «Solicitud rechazada (CSRF)» si era la primera página visitada. Se corrigió iniciando la sesión en `plantillas/cabecera.php` | Sin JavaScript todo sigue funcionando como páginas normales (mejora progresiva) |
 | 18 | Rehacer el informe técnico y la presentación de la Actividad 2 con la nueva interfaz y eliminar las versiones anteriores | Informe APA 7 (37 págs., 11 tablas y 15 figuras) con la sección «Interfaz con Bootstrap 5», la prueba de punta a punta, el error de sesión y CSRF, y los requisitos RF-10 y RNF-11; presentación de 14 diapositivas con la paleta pastel; capturas de docs/actividad-02/capturas tomadas de nuevo | Revisé el índice, las referencias cruzadas a tablas y figuras y cada diapositiva exportada a PDF | Nombres de los 5 integrantes completos en informes y presentaciones |
 
+## Actividad 3: usuarios, roles, ventas y reportes (labs 10–11) — integración del 26/10/2026
+
+Los labs 10 y 11 se resolvieron antes sobre el caso del docente (`laboratorios/`, `docs/actividad-03/entregado/`).
+El 26/10 se pidió a la IA **tomar esa actividad como modelo e incorporarla a Manos del Oriente**.
+
+| # | Lo que pedí | Lo que entregó la IA | Cómo lo verifiqué | Decisión / cambio propio |
+|---|---|---|---|---|
+| 19 | Revisar el estado del proyecto (había cambios sin commitear del 26/10 de madrugada) | Diagnóstico: dos sesiones con nombres distintos (`PHPSESSID` y `MANOS_SESION`) que hacían «perder» al usuario según la primera página visitada; login con dos campos CSRF; `cambiar_estado_pedido()` usaba `$line` en lugar de `$linea` (entregar un pedido fallaba); el usuario de Elena apuntaba a la ficha de Mario; contraseñas de demostración desconocidas; reportes vacíos por falta de ventas de prueba | `php verificar.php` daba 34/57 antes de tocar nada | Se rehízo la seguridad en un solo archivo (`src/Seguridad.php`) en lugar de parchar |
+| 20 | Usuarios, roles y CSRF siguiendo el lab 10 | Matriz `PERMISOS` con 3 roles, `exigir_usuario()` en cada página, bloqueo tras 5 intentos con el mismo mensaje exista o no el correo, regeneración del id de sesión, cambio de contraseña y alta de usuarios | 14 pruebas nuevas (cookie HttpOnly/SameSite, id que cambia, 12 rutas protegidas, cada formulario POST con token, redirección abierta `//sitio-malo.com` rechazada) | |
+| 21 | Ventas, acopios y reportes siguiendo el lab 11 | Transacciones con `FOR UPDATE` en orden fijo (evita interbloqueos), totales en centavos, acopio con **control de calidad**, reporte por mes/top 5/por socia y CSV con BOM | Calculé a mano las 6 ventas de `bd/08-demo.sql` (Bs 3.287,50) y lo vendido por socia; una venta con la 2.ª línea sin stock no deja nada guardado | El desempate del top 5 (dos prendas con 2 unidades) se definió por importe |
+| 22 | Error de la IA | Con consultas preparadas reales PDO no admite repetir `:desde` en la misma consulta; la IA lo había escrito así en el reporte | Lo detecté al leer el código antes de probar | Se separó en dos consultas |
+
+## Actividad 4: intercambio de datos, API REST y AJAX (labs 12–14) — 26/10/2026
+
+| # | Lo que pedí | Lo que entregó la IA | Cómo lo verifiqué | Decisión / cambio propio |
+|---|---|---|---|---|
+| 23 | Lab 12 con la guía integral | JSON con ISO 8601 y precios como texto, XML con XMLWriter, RSS 2.0, SOAP y REST de la misma prenda, pedidos JSON validados por tipos y XML con XSD (`LIBXML_NONET`) | Pruebas de escape (`Bolso & cartera <tejida>`), XML con entidad externa (XXE), fecha 30/02; medición propia SOAP 1.745 B vs REST 253 B | El JSON público no expone CI ni teléfono de las socias |
+| 24 | Lab 13: API REST | `src/Api.php`: CRUD, Bearer con hash SHA-256, problem+json, ETag/304, OPTIONS, 405 con `Allow`, 409, 415, 422 sin «corregir en silencio»; `docs/openapi.yaml` | 20 pruebas con tokens emitidos en la prueba misma; las evidencias ocultan y revocan los tokens | Se reutiliza `validar_producto()` de la web: API y formulario nunca discrepan |
+| 25 | Lab 14: fetch | Vitrina con `AbortController`, pausa de 250 ms, combobox WAI-ARIA, RSS con `DOMParser`, validación en vivo; `app.js` dejó de usar `innerHTML` (DOMParser para el HTML propio) | Edge automatizado: con red lenta se cancelaron 3 búsquedas y ganó «jean»; `aria-activedescendant` = opción seleccionada; 0 errores de consola o de CSP (12/12) | |
+| 26 | Errores encontrados por las pruebas | Un `id="contenido"` repetido (el `<main>` y el textarea de importar); las fotos de demostración estaban **cruzadas** (la polera mostraba el vestido, y POL-003 una captura de terminal) | La prueba en navegador falló; comparé cada foto con `fotosdeaprendas/` por su hash MD5 | Se reasignaron las 14 fotos |
+
+## Trabajo final: 2 módulos y publicación — 26/10/2026
+
+| # | Lo que pedí | Lo que entregó la IA | Cómo lo verifiqué | Decisión / cambio propio |
+|---|---|---|---|---|
+| 27 | Dos módulos nuevos (clase 15) | Módulo 1: liquidación y pagos con control de calidad (saldo calculado, pago que no supera el saldo, referencia única); módulo 2: pedidos con reserva (`CHECK reservado <= stock`, entregar = venta en una transacción) | Cifras a mano en `docs/proyecto-final/MODELO_DATOS.md` (saldo total Bs 2.330,00); 18 pruebas; MariaDB 10.11 y MySQL 8.4 → 136/136 | _(¿el precio por prenda lo fija la directiva o se negocia con cada socia?)_ |
+| 28 | Preparar la publicación en InfinityFree | `herramientas/empaquetar_infinityfree.php` (htdocs, .zip, .sql para phpMyAdmin, contraseñas nuevas), `.htaccess` que solo deja ver `public/`, `herramientas/auditar.php` | Copia local con Apache + `.htaccess` + la base importada del `.sql`: auditoría 18/18, login con las claves nuevas, Bearer que llega a PHP | **La IA cometió dos errores que la prueba detectó:** el hash nuevo se dañaba (`$2y` se leía como referencia en `preg_replace`) y la regla bloqueaba `/vendor/` (Bootstrap). El antibot de InfinityFree impide auditar con `curl` sin la cookie `__test` |
+
 ## Reflexión (completar)
 
 - ¿Qué parte entendimos mejor gracias a la IA?

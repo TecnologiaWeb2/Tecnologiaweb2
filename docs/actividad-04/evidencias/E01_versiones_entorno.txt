@@ -1,0 +1,80 @@
+# E01 · Versiones y entorno
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> php -v
+PHP 8.4.13 (cli) (built: Sep 23 2025 14:36:54) (ZTS Visual C++ 2022 x64)
+Copyright (c) The PHP Group
+Zend Engine v4.4.13, Copyright (c) Zend Technologies
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> php -m
+[PHP Modules]
+bcmath
+calendar
+Core
+ctype
+curl
+date
+dom
+fileinfo
+filter
+hash
+iconv
+json
+libxml
+mbstring
+mysqli
+mysqlnd
+openssl
+pcre
+PDO
+pdo_mysql
+pdo_sqlite
+pdo_sqlsrv
+Phar
+random
+readline
+Reflection
+session
+SimpleXML
+soap
+sodium
+SPL
+sqlite3
+sqlsrv
+standard
+tokenizer
+xml
+xmlreader
+xmlwriter
+zip
+zlib
+
+[Zend Modules]
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> docker --version
+Docker version 29.8.2, build 7fc2dff
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> docker compose version
+Docker Compose version v5.5.1
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> git --version
+git version 2.55.0.windows.3
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> node -v
+v24.18.0
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> (base de datos)
+10.11.19-MariaDB-ubu2204

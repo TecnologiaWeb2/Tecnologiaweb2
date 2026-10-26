@@ -1,0 +1,10 @@
+{
+    "nombre": "Polera de lino con bordado de cusi",
+    "categoria": "poleras",
+    "socio_id": 1,
+    "precio": "120.00",
+    "stock": 10,
+    "tallas": ["S", "M", "L", "XL"],
+    "color": "Blanco",
+    "descripcion": "Lino natural, bordado a mano. Nueva talla XL."
+}

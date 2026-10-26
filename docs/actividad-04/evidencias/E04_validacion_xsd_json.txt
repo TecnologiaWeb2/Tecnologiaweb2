@@ -1,0 +1,65 @@
+# E04 · Validación de pedidos: XML con XSD (LIBXML_NONET + schemaValidate) y JSON por tipos
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> php -r "leer_pedido_xml('pedido-boutique.xml')"
+--- pedido-boutique.xml ---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pedido válido de la Boutique Chiquitana (Santa Cruz de la Sierra) -->
+<pedido numero="BC-2026-0412">
+  <cliente>Boutique Chiquitana</cliente>
+  <fecha>2026-10-24</fecha>
+  <linea codigo="POL-001" cantidad="4"/>
+  <linea codigo="ACC-300" cantidad="6"/>
+</pedido>
+
+
+VÁLIDO → {"numero":"BC-2026-0412","cliente":"Boutique Chiquitana","fecha":"2026-10-24","lineas":{"POL-001":4,"ACC-300":6}}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> php -r "leer_pedido_xml('pedido-invalido.xml')"
+--- pedido-invalido.xml ---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pedido INVÁLIDO: fecha imposible, código fuera del patrón y cantidad negativa (el XSD lo rechaza) -->
+<pedido numero="BC-2026-0413">
+  <cliente>Boutique Chiquitana</cliente>
+  <fecha>2026-02-30</fecha>
+  <linea codigo="pol1" cantidad="-3"/>
+</pedido>
+
+
+RECHAZADO → El pedido no cumple el esquema pedido.xsd. Línea 5: Element 'fecha': '2026-02-30' is not a valid value of the atomic type 'xs:date'. Línea 6: Element 'linea', attribute 'codigo': [facet 'pattern'] The value 'pol1' is not accepted by the pattern '[A-Z]{3}-[A-Z0-9]{2,5}'. Línea 6: Element 'linea', attribute 'cantidad': '-3' is not a valid value of the local atomic type.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> php -r "leer_pedido_json('pedido-hotel.json')"
+--- pedido-hotel.json ---
+{
+    "numero": "HM-889",
+    "cliente": "Hotel Misiones",
+    "fecha": "2026-10-24",
+    "lineas": [
+        {"codigo": "ABR-201", "cantidad": 1},
+        {"codigo": "ACC-301", "cantidad": 3}
+    ]
+}
+
+
+VÁLIDO → {"numero":"HM-889","cliente":"Hotel Misiones","fecha":"2026-10-24","lineas":{"ABR-201":1,"ACC-301":3}}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> php -r "leer_pedido_json('pedido-invalido.json')"
+--- pedido-invalido.json ---
+{
+    "numero": "HM-890",
+    "cliente": "Hotel Misiones",
+    "fecha": "24/10/2026",
+    "lineas": [
+        {"codigo": "ABR-201", "cantidad": "2"},
+        {"codigo": "abr", "cantidad": -1}
+    ]
+}
+
+
+RECHAZADO → "fecha" debe ser una fecha real con formato AAAA-MM-DD. Línea 1: se espera {"codigo": "AAA-999", "cantidad": entero de 1 a 1000}. Línea 2: se espera {"codigo": "AAA-999", "cantidad": entero de 1 a 1000}.

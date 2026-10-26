@@ -1,0 +1,166 @@
+— Base de datos (Laboratorio 8) —
+✅ Las 5 tablas de la actividad 2 son InnoDB y tienen sus 4 claves foráneas
+✅ El esquema completo: 13 tablas InnoDB (actividades 2-4 y trabajo final) con 18 claves foráneas
+✅ Datos de ejemplo: 14 prendas, 6 socios, 5 categorías, 7 tallas, 34 tallas asignadas
+✅ Las claves foráneas rechazan una prenda con un socio inexistente
+✅ La conexión PDO usa excepciones y consultas preparadas reales (sin emulación)
+✅ La configuración de la conexión vive fuera de public/ (config/) y config.php no se sube a git
+
+— Modelo y repositorios (Laboratorio 9) —
+✅ Producto: promoción de propiedades readonly y valores por defecto
+✅ Los constructores rechazan datos inválidos (precio ≤ 0, CI y celular mal formados)
+✅ ProductoRepositorio::buscarPorCodigo() arma el objeto con su categoría, socio y tallas
+✅ paginar(): texto, categoría, talla, solo disponibles y orden por precio
+✅ Paginación: 14 prendas de 5 en 5 → 3 páginas; la página 99 y la -1 se corrigen
+✅ Inventario calculado por MySQL = verificado a mano (14 prendas, 157 u., Bs 19.538,50)
+✅ crear() guarda la prenda y sus tallas; actualizar() reemplaza las tallas; eliminar() las borra en cascada
+✅ Transacción: si falla una parte (socio inexistente), no queda nada guardado (ROLLBACK)
+✅ Un código repetido se rechaza con DomainException (UNIQUE en la base)
+✅ SocioRepositorio: búsqueda, filtro de estado y conteo de prendas con LEFT JOIN
+✅ SocioRepositorio: crear, actualizar y CI duplicado
+✅ Un socio con prendas no se puede eliminar (FOREIGN KEY ... ON DELETE RESTRICT)
+✅ validar_producto() sanea (espacios, mayúsculas, coma decimal, punto de miles, etiquetas HTML)
+✅ validar_producto() informa cada campo inválido (incluido un socio inactivo)
+✅ validar_socio() normaliza (CI, celular, nombre) y rechaza fecha futura y CI repetido
+
+— Intentos de inyección SQL contra los repositorios —
+✅ buscarPorCodigo("' OR '1'='1") no devuelve nada
+✅ paginar(texto: "' OR 1=1 -- ") devuelve 0 prendas (no las 14)
+✅ Los comodines del usuario se buscan literalmente: «%» y «_» devuelven 0 prendas
+✅ Un ORDER BY malicioso se ignora (lista blanca) y las tablas siguen intactas
+✅ Un nombre con SQL se guarda como texto literal, sin ejecutarse
+✅ existeCi("' OR ''='") es falso (el CI malicioso no coincide con nadie)
+✅ Ningún archivo de src/ concatena variables de PHP dentro de un SQL con datos del usuario
+
+— Aplicación web (servidor embebido) —
+✅ Sin sesión, la gestión de prendas redirige a iniciar sesión
+✅ La tienda pagina de 8 en 8: página 1 con 8 prendas, página 2 con 6
+✅ Filtros GET: ?q=jean&talla=XL → solo la chamarra; una categoría inventada se ignora
+✅ La búsqueda refleja el texto escapado (sin XSS)
+✅ Ficha de producto con su socio y código inexistente → 404
+✅ El formulario de prendas es multipart, tiene token CSRF y lista solo socios activos
+✅ POST sin token CSRF → 403 y no se guarda nada
+✅ Datos inválidos → 422, mensajes por campo (socio inactivo incluido) y valores escapados
+✅ Registro con foto PNG → 303 (PRG) y se guarda en MySQL con sus tallas
+✅ La foto se guarda fuera de public/ y la tienda la muestra con texto alternativo
+✅ foto.php entrega la imagen con su tipo real y nosniff; no permite salir de la carpeta (../)
+✅ Se rechazan un PHP disfrazado de JPG y una imagen de más de 2 MB; si otro campo falla, no quedan fotos huérfanas
+✅ Código repetido → 422 «Ya existe»
+✅ Editar → 303: cambian precio y tallas, el código no se altera y la foto se conserva
+✅ Una foto nueva reemplaza a la anterior (la vieja se borra)
+✅ Gestión muestra el resumen verificado a mano: 15 prendas · 163 unidades · Bs 21.277,90
+✅ Gestión pagina de 10 en 10 y la búsqueda filtra
+✅ Eliminar prenda: GET → 405, sin token → 403, POST → 303 y se borran la fila, sus tallas y su foto
+
+— CRUD de socios (web) —
+✅ Socios: listado paginado de 5 en 5 con cantidad de prendas; el botón eliminar se desactiva si tiene prendas
+✅ Registrar socio → 303 y queda en la base
+✅ CI repetido o datos inválidos → 422 con mensajes
+✅ Editar socio → 303 y se actualiza
+✅ Eliminar socio con prendas → se impide y se avisa; sin prendas → se elimina
+✅ Eliminar socio exige POST y token CSRF
+
+— Intentos de inyección SQL por la web —
+✅ Tienda: ?q=' OR '1'='1 → 0 prendas, sin error SQL
+✅ Ficha: ?codigo=POL-001' OR '1'='1 → 404 (no muestra otra prenda)
+✅ Tienda: ?orden=precio;DROP TABLE productos y ?pagina=1 OR 1=1 → 200 y las tablas siguen intactas
+✅ Socios: ?q=' UNION SELECT ci, ... → 0 socios
+✅ Formulario: un nombre con SQL se guarda literal y se muestra escapado
+
+— Actividad 3 · Laboratorio 10: usuarios, sesiones, roles y CSRF —
+✅ Las contraseñas se guardan con password_hash (bcrypt), nunca en texto ni con md5/sha1
+✅ La base exige que un usuario «socio» esté vinculado a su ficha (CHECK)
+✅ Sin sesión, las 12 páginas internas redirigen a /entrar.php (y no muestran datos)
+✅ Iniciar sesión sin token CSRF → 403
+✅ Contraseña incorrecta y correo inexistente → 401 con el MISMO mensaje (no revela qué correos existen)
+✅ Login correcto → 303 al panel; cookie MANOS_SESION con HttpOnly y SameSite=Lax; el id de sesión cambia
+✅ Todas las páginas responden con cabeceras de seguridad (CSP, X-Frame-Options, nosniff, Referrer-Policy)
+✅ Cada formulario POST de las páginas internas lleva su token CSRF
+✅ «volver» solo acepta rutas internas: ?volver=//sitio-malo.com se ignora
+✅ Cerrar sesión: GET → 405; POST con CSRF → 303 y la sesión deja de valer
+✅ 5 contraseñas incorrectas seguidas bloquean la cuenta 15 minutos (ni la correcta entra)
+✅ Rol operador: vende y gestiona prendas, pero NO administra usuarios ni tokens ni elimina prendas (403)
+✅ Rol socia: entra directo a SU liquidación; no ve prendas, ventas ni la liquidación de otra socia
+✅ Mi cuenta: la contraseña actual errónea o una nueva débil → 422; una válida se guarda y sirve para entrar
+✅ Administración crea usuarios (correo único, rol socia exige ficha) y no puede cambiar su propio rol
+
+— Actividad 3 · Laboratorio 11: ventas, acopios, transacciones y reportes —
+✅ Reporte jul–sep = verificado a mano: 6 ventas, 27 prendas, Bs 3.287,50 (965,00 · 1.280,00 · 1.042,50)
+✅ Top 5 por unidades: ACC-300 (6), POL-001 (5), ACC-302 (4), POL-003 (3), ABR-201 (2, desempata por importe)
+✅ Vendido por socia: Mario 1.250,00 · Rosa 825,00 · Lidia 437,00 · Elena 415,50 · Juana 360,00 (suma = total)
+✅ El rango se filtra por fecha (solo agosto: 2 ventas, Bs 1.280,00) y una fecha inválida se rechaza
+✅ La página de reportes muestra las mismas cifras y el CSV (UTF-8 con BOM, «;») también
+✅ Venta web: POST con CSRF → 303; total = Σ precio × cantidad y el stock baja (POL-001 24→21, ACC-300 30→28)
+✅ Venta sin token CSRF → 403 y no se registra
+✅ TRANSACCIÓN: si la 2.ª línea no tiene stock, no se guarda NADA (ni la venta ni el descuento de la 1.ª)
+✅ Una venta respeta lo reservado por pedidos: POL-003 tiene 18 pero 4 reservadas → vender 15 se rechaza
+✅ Cantidades inválidas (0, negativa, texto) y códigos mal formados se rechazan
+✅ Acopio con control de calidad: 10 entregadas, 8 aprobadas a Bs 48 → stock +8 y Bs 384,00 para la socia
+✅ Acopio: más aprobadas que entregadas, o rechazos sin motivo → 422 (y la base también lo impide con CHECK)
+
+— Actividad 4 · Laboratorio 12: intercambio JSON, XML, RSS y SOAP/REST —
+✅ /datos/catalogo.json: application/json, fechas ISO 8601 (−04:00) y precios decimales como texto («95.00»)
+✅ /datos/catalogo.xml: XML bien formado con XMLWriter; «Bolso & cartera <tejida>» se escapa (&amp; &lt;)
+✅ Pedido XML válido contra pedido.xsd → se lee; el inválido (fecha 30/02, código, cantidad −3) se rechaza con el motivo
+✅ XML con entidad externa (XXE) no lee archivos del servidor: el esquema lo rechaza y la entidad no se expande
+✅ Pedido JSON: el válido se lee; el inválido se rechaza por tipos («"2"» no es entero), fecha y código
+✅ /noticias.rss: RSS 2.0 con title, description, guid y pubDate en formato DATE_RSS
+✅ SOAP y REST devuelven la MISMA prenda (precio, stock, socia); SOAP con código inexistente → SoapFault
+✅ Importar pedido por la web: JSON válido → pedido «json» que reserva stock; el XML inválido → 422 y nada se guarda
+✅ herramientas/consumir_publico.php existe y consume un servicio externo con cURL comprobando HTTP y JSON
+
+— Actividad 4 · Laboratorio 13: API REST /api/v1 —
+✅ GET /productos?pagina=2&por_pagina=5 → 200 con datos (5), meta (14 en 3 páginas) y enlaces anterior/siguiente
+✅ Filtros de la API: q=jean&talla=XL → 1 (ABR-200); categoria=vestidos → 2; disponibles=1 → 12
+✅ Parámetros inválidos → 422 application/problem+json con «errores» por campo (no se corrigen en silencio)
+✅ GET /productos/sugerencias?q=po responde antes que /productos/{codigo}; q de 1 letra → 422
+✅ GET /productos/{codigo} → 200 con ETag; If-None-Match con ese ETag → 304 SIN cuerpo; inexistente → 404
+✅ POST sin token → 401 con WWW-Authenticate; token inventado → 401; token de socia → 403
+✅ POST con Content-Type incorrecto → 415; JSON roto → 400; datos inválidos → 422 con errores por campo
+✅ POST válido (operador) → 201 Created + Location /api/v1/productos/POL-050; repetido → 409
+✅ PUT /productos/POL-050 → 200: precio 120.00, stock 10 y talla XL (el código de la URL manda)
+✅ DELETE: el operador no puede (403); administración → 204 SIN cuerpo y después GET → 404
+✅ DELETE de una prenda con ventas → 409 (el historial no se pierde); método no soportado → 405 con Allow
+✅ OPTIONS (preflight CORS) → 204 con Allow-Origin, Allow-Methods y Allow-Headers (Authorization)
+✅ Los tokens se guardan como hash SHA-256 (el token no está en la base); uno revocado deja de funcionar → 401
+✅ GET /api/v1/openapi.yaml: OpenAPI 3.1 con seguridad Bearer y todas las rutas implementadas
+✅ Un error inesperado de la API no revela detalles (503/500 con referencia, sin SQLSTATE ni rutas)
+
+— Actividad 4 · Laboratorio 14: interfaz asíncrona con fetch —
+✅ Ningún script propio usa innerHTML, outerHTML, insertAdjacentHTML ni document.write (datos con textContent)
+✅ catalogo.js: AbortController en cada carga, pausa de 250 ms, replaceChildren y textContent
+✅ api.js: comprueba response.ok, lee problem+json y distingue AbortError de un fallo de red
+✅ Autocompletar accesible: role=combobox/listbox/option, aria-expanded, aria-activedescendant, aria-selected y Escape
+✅ Novedades: el RSS se lee con DOMParser, se comprueba parsererror y se muestran 5 con textContent
+✅ Validación en vivo: formato local sin petición; 200 = código ocupado, 404 = disponible (el servidor sigue validando)
+✅ La grilla asíncrona recibe todo lo que dibuja: foto interna, categoría, precio en texto, disponible y tallas
+
+— Trabajo final · Módulo 1: liquidación y pagos a socias —
+✅ Liquidado = Σ aprobadas × precio: Rosa 1.700 · Elena 1.065 · Mario 1.120 · Juana 1.200 · Lidia 550 (total Bs 5.635,00)
+✅ Saldo = liquidado − pagado: Rosa 700 · Elena 480 · Mario 0 · Juana 600 · Lidia 550 → pendiente total Bs 2.330,00
+✅ Las prendas rechazadas no se pagan: Rosa entregó 24, se aprobaron 22 (2 con el bordado incompleto)
+✅ Un pago mayor al saldo se rechaza (Rosa: Bs 800 > Bs 700) y no se guarda
+✅ Pago válido (Bs 500,50) → 303 y el saldo de Rosa baja a Bs 199,50; la referencia repetida se rechaza
+✅ Pagar exige el permiso: una socia que envía el formulario recibe 403
+✅ API: la socia consulta SU liquidación (200, saldo 480.00) pero no la de otra (403); sin token → 401
+
+— Trabajo final · Módulo 2: pedidos de compradores con reserva de stock —
+✅ El pedido pendiente de demostración reserva 4 POL-003 y 2 ACC-301; el cancelado no reserva nada
+✅ La base impide reservar más que el stock: CHECK (reservado <= stock)
+✅ Crear pedido por la web → 303, número PED-000003, total Bs 635,00 y reserva 3 POL-001 + 1 VES-100 (stock intacto)
+✅ No se puede reservar más de lo libre: VES-100 tiene 5 y 1 reservada → pedir 5 se rechaza sin guardar nada
+✅ ENTREGAR (una transacción): crea la venta por el total del pedido y bajan stock y reserva a la vez
+✅ CANCELAR libera la reserva (POL-003 vuelve a 0 reservadas, stock 18 intacto); un entregado no cambia de estado
+✅ El stock de una prenda no se puede editar por debajo de lo reservado (422 con el motivo)
+✅ API: POST /pedidos (operador) → 201 + Location, origen «api» y reserva; número repetido → 409; sin permiso → 403
+✅ La página de pedidos lista el estado de cada uno y lo reservado ahora
+
+— Seguridad del código (lo que revisa la auditoría del docente) —
+✅ Todos los archivos PHP declaran strict_types
+✅ No hay credenciales en el código: config.php está en .gitignore y la plantilla no trae clave
+✅ En Apache/InfinityFree, .htaccess bloquea src/, config/, bd/, plantillas/ y datos/ (solo public/ es visible)
+
+— Configuración protegida y errores —
+✅ El código, la configuración y el SQL no se pueden descargar por URL (solo public/ es accesible)
+✅ Si la base de datos no responde: 503 con un mensaje genérico (sin SQLSTATE, rutas ni credenciales)
+Resultado: 136 de 136 comprobaciones

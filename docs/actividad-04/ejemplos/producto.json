@@ -1,0 +1,11 @@
+{
+    "codigo": "POL-050",
+    "nombre": "Polera de lino con bordado de cusi",
+    "categoria": "poleras",
+    "socio_id": 1,
+    "precio": "110.00",
+    "stock": 6,
+    "tallas": ["S", "M", "L"],
+    "color": "Blanco",
+    "descripcion": "Lino natural, bordado a mano."
+}

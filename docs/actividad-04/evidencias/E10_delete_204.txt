@@ -1,0 +1,41 @@
+# E10 · DELETE → 204 sin cuerpo; después GET → 404
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> curl.exe -i -X DELETE "http://127.0.0.1:8010/api/v1/productos/POL-050" -H "Authorization: Bearer $TOKEN"   # $TOKEN = token de operador (oculto)
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 268 bytes en 22 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#prohibido",
+    "title": "Prohibido",
+    "status": 403,
+    "detail": "El rol Operador no permite esta operación.",
+    "instance": "/api/v1/productos/POL-050"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X DELETE "http://127.0.0.1:8010/api/v1/productos/POL-050" -H "Authorization: Bearer $TOKEN"   # $TOKEN = token de admin (oculto)
+HTTP/1.1 204 No Content
+Cache-Control: no-store
+(respuesta: 0 bytes en 42 ms)
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i "http://127.0.0.1:8010/api/v1/productos/POL-050"
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 261 bytes en 33 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#no-encontrado",
+    "title": "No encontrado",
+    "status": 404,
+    "detail": "No existe la prenda POL-050.",
+    "instance": "/api/v1/productos/POL-050"
+}

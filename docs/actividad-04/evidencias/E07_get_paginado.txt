@@ -1,0 +1,78 @@
+# E07 · GET paginado con filtros: datos, meta y enlaces
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> curl.exe -i "http://127.0.0.1:8010/api/v1/productos?pagina=2&por_pagina=5&orden=precio-asc"
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Type: application/json; charset=UTF-8
+(respuesta: 5005 bytes en 34 ms)
+
+{
+    "datos": [
+        {
+            "codigo": "POL-002",
+            "nombre": "Blusa de tocuyo manga corta",
+            "categoria": {
+                "id": "poleras",
+                "nombre": "Poleras y blusas"
+            },
+            "precio": "120.00",
+            "stock": 0,
+            "reservado": 0,
+            "disponible": 0,
+            "tallas": [
+                "XS",
+                "S",
+                "M"
+            ],
+            "color": "Crudo",
+            "descripcion": "Tela de tocuyo tradicional, fresca para el calor del oriente.",
+            "foto": "/foto.php?f=e1ef85fc5a5aab80ef9e389b.jpg",
+            "socio": {
+                "id": 2,
+                "nombre": "Elena Masabí Tomichá",
+                "comunidad": "San Javier"
+            },
+            "enlaces": {
+                "self": "/api/v1/productos/POL-002",
+                "web": "/producto.php?codigo=POL-002"
+            }
+… (130 líneas más)
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i "http://127.0.0.1:8010/api/v1/productos/sugerencias?q=po"
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=60
+Content-Type: application/json; charset=UTF-8
+(respuesta: 714 bytes en 25 ms)
+
+{
+    "datos": [
+        {
+            "codigo": "POL-002",
+            "nombre": "Blusa de tocuyo manga corta",
+            "precio": "120.00"
+        },
+        {
+            "codigo": "POL-001",
+            "nombre": "Polera de algodón con bordado de tajibo",
+            "precio": "95.00"
+        },
+        {
+            "codigo": "POL-003",
+            "nombre": "Polera estampada Chiquitanía",
+            "precio": "85.00"
+        },
+        {
+            "codigo": "ABR-201",
+            "nombre": "Poncho tejido de lana",
+            "precio": "310.00"
+        },
+        {
+            "codigo": "VES-100",
+            "nombre": "Vestido tipoy bordado",
+            "precio": "350.00"
+        }
+    ]
+}

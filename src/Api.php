@@ -407,6 +407,10 @@ final class Api
         foreach ($cabeceras as $nombre => $valor) {
             header("$nombre: $valor");
         }
+        if ($estado === 204 || $estado === 304) {
+            header('Content-Type:');                   // sin cuerpo: PHP no debe anunciar text/html
+            header_remove('Content-Type');
+        }
         if ($datos !== null && $estado !== 204 && $estado !== 304) {
             header("Content-Type: $tipo; charset=UTF-8");
             if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'HEAD') {

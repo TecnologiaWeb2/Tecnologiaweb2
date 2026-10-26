@@ -1,0 +1,19 @@
+Mét. Ruta                           Acción                            Anónimo  Admin  Operador  Socio
+----------------------------------------------------------------------------------------------------------
+GET   /productos                     Ver productos                           302    200       200    200
+GET   /productos/nuevo               Formulario de producto                  302    200       200    403
+POST  /productos                     Registrar producto (vacío)             302    422       422    403
+POST  /productos/ZZZ-999             Editar producto inexistente             302    404       404    403
+POST  /productos/ZZZ-999/eliminar    Eliminar producto inexistente           302    404       403    403
+GET   /socios                        Ver socios                              302    200       200    403
+GET   /ventas/nueva                  Formulario de venta/acopio              302    200       200    403
+POST  /ventas                        Registrar venta (vacía)                302    422       422    403
+POST  /acopios                       Registrar acopio (vacío)               302    422       422    403
+GET   /reportes                      Reportes                                302    200       403    403
+GET   /reportes/ventas.csv           Exportar CSV                            302    200       403    403
+GET   /usuarios                      Lista de usuarios                       302    200       403    403
+GET   /usuarios/nuevo                Formulario de usuario                   302    200       403    403
+POST  /usuarios                      Registrar usuario (vacío)              302    422       403    403
+----------------------------------------------------------------------------------------------------------
+✅ Todas las respuestas coinciden con lo esperado para cada rol.
+Resultado: 0 de 0 comprobaciones

@@ -1,0 +1,9 @@
+{
+    "numero": "HM-890",
+    "cliente": "Hotel Misiones",
+    "fecha": "24/10/2026",
+    "lineas": [
+        {"codigo": "ABR-201", "cantidad": "2"},
+        {"codigo": "abr", "cantidad": -1}
+    ]
+}

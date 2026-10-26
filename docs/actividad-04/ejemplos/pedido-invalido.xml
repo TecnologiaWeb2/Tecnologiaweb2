@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pedido INVÁLIDO: fecha imposible, código fuera del patrón y cantidad negativa (el XSD lo rechaza) -->
+<pedido numero="BC-2026-0413">
+  <cliente>Boutique Chiquitana</cliente>
+  <fecha>2026-02-30</fecha>
+  <linea codigo="pol1" cantidad="-3"/>
+</pedido>

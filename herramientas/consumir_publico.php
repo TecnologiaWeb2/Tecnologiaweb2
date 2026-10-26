@@ -11,6 +11,16 @@ curl_setopt_array($ch, [
     CURLOPT_FOLLOWLOCATION => false,
     CURLOPT_HTTPHEADER => ['Accept: application/json', 'User-Agent: ManosDelOriente/1.0 (Tecnologia Web II)'],
 ]);
+// La verificación del certificado HTTPS NUNCA se desactiva. Si el php.ini de Windows no indica curl.cainfo,
+// se usa el paquete de certificados que trae Git para Windows (o el de la variable CURL_CA_BUNDLE).
+if ((string) ini_get('curl.cainfo') === '') {
+    foreach ([getenv('CURL_CA_BUNDLE') ?: '', 'C:/Program Files/Git/mingw64/etc/ssl/certs/ca-bundle.crt', 'C:/Program Files/Git/usr/ssl/certs/ca-bundle.crt'] as $ca) {
+        if ($ca !== '' && is_file($ca)) {
+            curl_setopt($ch, CURLOPT_CAINFO, $ca);
+            break;
+        }
+    }
+}
 $inicio = microtime(true);
 $cuerpo = curl_exec($ch);
 if ($cuerpo === false) {

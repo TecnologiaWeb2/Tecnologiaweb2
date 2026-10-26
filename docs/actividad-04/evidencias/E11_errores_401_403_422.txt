@@ -1,0 +1,174 @@
+# E11 · Errores en application/problem+json: 400, 401, 403, 404, 405, 409, 415 y 422
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> curl.exe -i -X POST "http://127.0.0.1:8010/api/v1/productos" --data-binary "@producto.json"
+HTTP/1.1 401 Unauthorized
+Cache-Control: no-store
+WWW-Authenticate: Bearer realm="manos-del-oriente"
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 296 bytes en 30 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#no-autenticado",
+    "title": "No autenticado",
+    "status": 401,
+    "detail": "Esta operación requiere un token: \"Authorization: Bearer mdo_…\".",
+    "instance": "/api/v1/productos"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X POST "http://127.0.0.1:8010/api/v1/productos" -H "Authorization: Bearer $TOKEN" --data-binary "@producto.json"   # $TOKEN = token inventado
+HTTP/1.1 401 Unauthorized
+Cache-Control: no-store
+WWW-Authenticate: Bearer realm="manos-del-oriente", error="invalid_token"
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 274 bytes en 27 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#no-autenticado",
+    "title": "No autenticado",
+    "status": 401,
+    "detail": "El token no es válido, venció o fue revocado.",
+    "instance": "/api/v1/productos"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X POST "http://127.0.0.1:8010/api/v1/productos" -H "Authorization: Bearer $TOKEN" --data-binary "@producto.json"   # $TOKEN = token de socio (oculto)
+HTTP/1.1 403 Forbidden
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 265 bytes en 37 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#prohibido",
+    "title": "Prohibido",
+    "status": 403,
+    "detail": "El rol Socia o socio no permite esta operación.",
+    "instance": "/api/v1/productos"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X POST "http://127.0.0.1:8010/api/v1/productos" -H "Authorization: Bearer $TOKEN" --data-binary '{"codigo": "POL-051",'   # $TOKEN = token de operador (oculto)
+HTTP/1.1 400 Bad Request
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 283 bytes en 61 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#peticion-mal-formada",
+    "title": "Petición mal formada",
+    "status": 400,
+    "detail": "El cuerpo no es JSON válido: Syntax error.",
+    "instance": "/api/v1/productos"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X POST "http://127.0.0.1:8010/api/v1/productos" -H "Authorization: Bearer $TOKEN" -H "Content-Type: text/plain" --data-binary '{"codigo":"POL-051"}'   # $TOKEN = token de operador (oculto)
+HTTP/1.1 415 Unsupported Media Type
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 315 bytes en 60 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#tipo-de-contenido-no-soportado",
+    "title": "Tipo de contenido no soportado",
+    "status": 415,
+    "detail": "Envía el cuerpo con \"Content-Type: application/json\".",
+    "instance": "/api/v1/productos"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X POST "http://127.0.0.1:8010/api/v1/productos" -H "Authorization: Bearer $TOKEN" --data-binary '{"codigo":"xx","nombre":"A","categoria":"zapatos","socio_id":6,"precio":"-1"}'   # $TOKEN = token de operador (oculto)
+HTTP/1.1 422 Unknown Status Code
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 648 bytes en 56 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#datos-invalidos",
+    "title": "Datos inválidos",
+    "status": 422,
+    "detail": "Revisa los campos indicados en \"errores\".",
+    "instance": "/api/v1/productos",
+    "errores": {
+        "codigo": "El código debe tener el formato AAA-999 (ej. POL-001).",
+        "nombre": "El nombre debe tener entre 3 y 80 caracteres.",
+        "categoria": "Elige una categoría de la lista.",
+        "precio": "El precio debe ser un número entre 0,01 y 100.000.",
+        "socio_id": "Elige la socia o el socio que confeccionó la prenda."
+    }
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i "http://127.0.0.1:8010/api/v1/productos?por_pagina=500&orden=barato"
+HTTP/1.1 422 Unknown Status Code
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 439 bytes en 37 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#datos-invalidos",
+    "title": "Datos inválidos",
+    "status": 422,
+    "detail": "Revisa los parámetros indicados en \"errores\".",
+    "instance": "/api/v1/productos",
+    "errores": {
+        "por_pagina": "Debe ser un entero entre 1 y 50.",
+        "orden": "Valores permitidos: nombre, precio-asc, precio-desc, stock."
+    }
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X PATCH "http://127.0.0.1:8010/api/v1/productos/POL-001" -H "Authorization: Bearer $TOKEN" --data-binary '{}'   # $TOKEN = token de admin (oculto)
+HTTP/1.1 405 Method Not Allowed
+Cache-Control: no-store
+Allow: GET, PUT, DELETE, OPTIONS
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 311 bytes en 47 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#metodo-no-permitido",
+    "title": "Método no permitido",
+    "status": 405,
+    "detail": "El método PATCH no está permitido en /api/v1/productos/POL-001.",
+    "instance": "/api/v1/productos/POL-001"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i -X DELETE "http://127.0.0.1:8010/api/v1/productos/POL-001" -H "Authorization: Bearer $TOKEN"   # $TOKEN = token de admin (oculto)
+HTTP/1.1 409 Conflict
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 327 bytes en 48 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#conflicto",
+    "title": "Conflicto",
+    "status": 409,
+    "detail": "No se puede eliminar POL-001: tiene ventas, acopios o pedidos registrados. Puedes dejar su stock en 0.",
+    "instance": "/api/v1/productos/POL-001"
+}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i "http://127.0.0.1:8010/api/v1/productos/NOP-000"
+HTTP/1.1 404 Not Found
+Cache-Control: no-store
+Content-Type: application/problem+json; charset=UTF-8
+(respuesta: 261 bytes en 30 ms)
+
+{
+    "type": "https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#no-encontrado",
+    "title": "No encontrado",
+    "status": 404,
+    "detail": "No existe la prenda NOP-000.",
+    "instance": "/api/v1/productos/NOP-000"
+}

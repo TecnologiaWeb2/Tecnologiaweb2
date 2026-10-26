@@ -1,0 +1,44 @@
+# E02 · Catálogo JSON (ISO 8601 y precios como texto)
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> curl.exe -i "http://127.0.0.1:8010/datos/catalogo.json"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Cache-Control: public, max-age=300
+(respuesta: 6443 bytes en 92 ms)
+
+{
+    "asociacion": "Asociación de Confeccionistas Textiles «Manos del Oriente»",
+    "generado": "2026-10-26T14:58:33-04:00",
+    "actualizado": "2026-10-26T14:58:32-04:00",
+    "total": 14,
+    "productos": [
+        {
+            "codigo": "ABR-200",
+            "nombre": "Chamarra de jean forrada",
+            "categoria": "Abrigos y chamarras",
+            "precio": "260.00",
+            "moneda": "BOB",
+            "stock": 9,
+            "tallas": [
+                "M",
+                "L",
+                "XL",
+                "XXL"
+            ],
+            "color": "Azul",
+            "confecciono": "Juana Pesoa Rojas",
+            "comunidad": "Concepción"
+        },
+        {
+            "codigo": "ABR-201",
+            "nombre": "Poncho tejido de lana",
+            "categoria": "Abrigos y chamarras",
+            "precio": "310.00",
+            "moneda": "BOB",
+            "stock": 4,
+            "tallas": [
+                "U"
+            ],
+            "color": "Gris",
+… (190 líneas más)

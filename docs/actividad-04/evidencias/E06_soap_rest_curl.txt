@@ -1,0 +1,31 @@
+# E06 · SOAP frente a REST (medido en este equipo) y consumo de un servicio público con cURL
+# Generado el 26/10/2026 14:58 contra el sistema en marcha (herramientas/evidencias_api.php)
+
+PS> php herramientas/soap_cliente.php POL-001 http://127.0.0.1:8010
+Estilo Método URL                                Formato                   Petición  Respuesta   Tiempo
+SOAP   POST   /soap.php (precio)                 XML (sobre SOAP 1.1)           507B      1745B   51.2ms
+REST   GET    /datos/productos/POL-001           JSON (HTTP 200)                  0B       253B   38.4ms
+
+SOAP → {"codigo":"POL-001","nombre":"Polera de algodón con bordado de tajibo","categoria":"Poleras y blusas","precio":"95.00","moneda":"BOB","stock":24,"tallas":["S","M","L","XL"],"color":"Blanco","confecciono":"Rosa Chuvé Supepí","comunidad":"Concepción"}
+REST → {"codigo":"POL-001","nombre":"Polera de algodón con bordado de tajibo","categoria":"Poleras y blusas","precio":"95.00","moneda":"BOB","stock":24,"tallas":["S","M","L","XL"],"color":"Blanco","confecciono":"Rosa Chuvé Supepí","comunidad":"Concepción"}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> curl.exe -i "http://127.0.0.1:8010/datos/productos/POL-001"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+(respuesta: 253 bytes en 57 ms)
+
+{"codigo":"POL-001","nombre":"Polera de algodón con bordado de tajibo","categoria":"Poleras y blusas","precio":"95.00","moneda":"BOB","stock":24,"tallas":["S","M","L","XL"],"color":"Blanco","confecciono":"Rosa Chuvé Supepí","comunidad":"Concepción"}
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+PS> php herramientas/consumir_publico.php
+GET https://jsonplaceholder.typicode.com/todos/1 → HTTP 200 · application/json; charset=utf-8 · 83 bytes · 586 ms
+Array
+(
+    [userId] => 1
+    [id] => 1
+    [title] => delectus aut autem
+    [completed] =>
+)
