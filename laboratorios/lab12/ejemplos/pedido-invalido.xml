@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pedido con errores: código con minúsculas, cantidad negativa y fecha imposible -->
+<pedido numero="ES-2026-0413">
+  <cliente>Supermercado El Sol</cliente>
+  <fecha>2026-02-31</fecha>
+  <linea codigo="mie-500" cantidad="-3"/>
+</pedido>

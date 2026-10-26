@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pedido válido del Supermercado El Sol (Santa Cruz) -->
+<pedido numero="ES-2026-0412">
+  <cliente>Supermercado El Sol</cliente>
+  <fecha>2026-10-02</fecha>
+  <linea codigo="MIE-500" cantidad="12"/>
+  <linea codigo="PRO-30" cantidad="6"/>
+</pedido>

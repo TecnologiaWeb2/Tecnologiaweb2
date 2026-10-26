@@ -1,0 +1,12 @@
+{
+  "name": "flor-chiquitania-pruebas-navegador",
+  "private": true,
+  "description": "Pruebas en Chrome del laboratorio 14 (usa el Chrome instalado; no descarga navegadores)",
+  "type": "module",
+  "scripts": {
+    "probar": "node probar_navegador.mjs http://127.0.0.1:8000"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.48.0"
+  }
+}

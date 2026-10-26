@@ -1,0 +1,5 @@
+vendor
+datos/errores.log
+public/uploads/productos/*
+!public/uploads/productos/.gitkeep
+.git

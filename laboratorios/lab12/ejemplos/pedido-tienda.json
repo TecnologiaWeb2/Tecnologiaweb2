@@ -1,0 +1,9 @@
+{
+    "numero": "TV-889",
+    "cliente": "Tienda Naturista Vida",
+    "fecha": "2026-10-02",
+    "lineas": [
+        {"codigo": "POL-250", "cantidad": 2},
+        {"codigo": "CRE-MIE", "cantidad": 5}
+    ]
+}

@@ -1,0 +1,92 @@
+# public/api/v1/openapi.yaml — Contrato de la API (OpenAPI 3.1). Se puede abrir en https://editor.swagger.io
+openapi: 3.1.0
+info:
+  title: API de la Asociación de Apicultores Flor de la Chiquitanía
+  version: 1.0.0
+  description: Catálogo de productos. Lectura pública; escritura con token Bearer según el rol.
+servers:
+  - url: http://127.0.0.1:8000/api/v1
+components:
+  securitySchemes:
+    token:
+      type: http
+      scheme: bearer
+  schemas:
+    Producto:
+      type: object
+      properties:
+        codigo: { type: string, pattern: '^[A-Z]{3}-[A-Z0-9]{2,4}$', example: MIE-500 }
+        nombre: { type: string, example: Miel multifloral 500 g }
+        categoria: { type: string, enum: [Miel, Derivados, Cera] }
+        precio: { type: string, description: Decimal exacto como texto, example: '45.00' }
+        stock: { type: integer, minimum: 0 }
+        disponible: { type: boolean }
+        imagen: { type: string, description: Ruta pública de la foto (o /img/sin-imagen.svg si no tiene), example: /uploads/productos/9f2c1ab04d7e3b58.jpg }
+        socio: { type: object, properties: { id: { type: integer }, nombre: { type: string } } }
+    ProductoEntrada:
+      type: object
+      required: [nombre, categoria, precio, stock, socio_id]
+      properties:
+        codigo: { type: string, description: Solo en POST }
+        nombre: { type: string, minLength: 3, maxLength: 80 }
+        categoria: { type: string, enum: [Miel, Derivados, Cera] }
+        precio: { type: string, example: '32.50' }
+        stock: { type: integer, minimum: 0 }
+        socio_id: { type: integer }
+    Problema:
+      type: object
+      description: RFC 9457 (application/problem+json)
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        errores: { type: object, additionalProperties: { type: string } }
+paths:
+  /productos:
+    get:
+      summary: Lista paginada de productos
+      parameters:
+        - { name: pagina, in: query, schema: { type: integer, minimum: 1 } }
+        - { name: por_pagina, in: query, schema: { type: integer, minimum: 1, maximum: 50 } }
+        - { name: q, in: query, schema: { type: string } }
+        - { name: categoria, in: query, schema: { type: string, enum: [Miel, Derivados, Cera] } }
+        - { name: orden, in: query, schema: { type: string, enum: [nombre, precio, precio_desc, stock] } }
+      responses:
+        '200': { description: Página de productos con meta y enlaces }
+        '422': { description: Parámetros inválidos, content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problema' } } } }
+    post:
+      summary: Registrar un producto
+      security: [ { token: [] } ]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ProductoEntrada' } } } }
+      responses:
+        '201': { description: Creado (cabecera Location) }
+        '401': { description: Falta token o no es válido }
+        '403': { description: El rol no lo permite }
+        '415': { description: El cuerpo no es application/json }
+        '422': { description: Datos inválidos (errores por campo) }
+  /productos/{codigo}:
+    parameters:
+      - { name: codigo, in: path, required: true, schema: { type: string } }
+    get:
+      summary: Un producto (con ETag; If-None-Match → 304)
+      responses:
+        '200': { description: El producto, content: { application/json: { schema: { $ref: '#/components/schemas/Producto' } } } }
+        '304': { description: No cambió desde la versión que tiene el cliente }
+        '404': { description: No existe }
+    put:
+      summary: Reemplazar un producto
+      security: [ { token: [] } ]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ProductoEntrada' } } } }
+      responses:
+        '200': { description: Actualizado }
+        '404': { description: No existe }
+        '422': { description: Datos inválidos }
+    delete:
+      summary: Eliminar un producto (solo administración)
+      security: [ { token: [] } ]
+      responses:
+        '204': { description: Eliminado }
+        '403': { description: El rol no lo permite }
+        '404': { description: No existe }

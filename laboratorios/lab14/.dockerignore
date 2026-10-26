@@ -1,0 +1,8 @@
+vendor
+datos/errores.log
+public/uploads/productos/*
+!public/uploads/productos/.gitkeep
+.git
+node_modules
+HOJA_TRABAJO.md
+HOJA_TRABAJO_resuelta.md
