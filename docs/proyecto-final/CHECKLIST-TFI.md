@@ -31,6 +31,7 @@ Cada indicador de la rúbrica (20 pts) con su evidencia concreta. ✅ hecho · �
 - [x] Manual de usuario → [Manual_Usuario_Manos_del_Oriente.pdf](Manual_Usuario_Manos_del_Oriente.pdf)
 - [x] Informe técnico → [Informe_Tecnico_Proyecto_Final.pdf](Informe_Tecnico_Proyecto_Final.pdf)
 - [x] Presentación `.pptx` → [Presentacion_Proyecto_Final.pptx](Presentacion_Proyecto_Final.pptx)
+- [x] Bitácora de IA (documento) → [Bitacora_IA_Proyecto_Final.pdf](Bitacora_IA_Proyecto_Final.pdf)
 - [ ] Bitácora de IA con la **reflexión de cada integrante** (⏳ completar en `docs/BITACORA_IA.md`)
 - [ ] Commits de todos los integrantes (⏳ cada uno sube al menos su parte)
 - [ ] Ensayo de la defensa de 15 min (guion en [PLAN.md](PLAN.md))
