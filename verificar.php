@@ -1,5 +1,7 @@
 <?php
-// verificar.php — Comprueba la Actividad 2 (MySQL + PDO + repositorios + inyección SQL). Uso: php verificar.php
+// verificar.php — Comprueba TODO el proyecto: actividad 2 (MySQL + PDO + repositorios + inyección SQL), actividad 3
+// (usuarios, roles, CSRF, ventas y reportes), actividad 4 (JSON/XML/RSS/SOAP, API REST, AJAX) y los 2 módulos del
+// trabajo final (liquidaciones y pedidos). Uso: php verificar.php
 // Requiere MySQL/MariaDB encendido. Usa una base de datos SEPARADA (manos_del_oriente_pruebas) y una carpeta
 // de fotos temporal: los datos reales no se tocan. La base de pruebas se borra al terminar.
 declare(strict_types=1);
@@ -31,6 +33,18 @@ function token(array $respuesta): string
     preg_match('/name="csrf" value="([a-f0-9]{64})"/', $respuesta['cuerpo'], $m);
     return $m[1] ?? '';
 }
+/** Inicia sesión por la web (como un navegador: pide el formulario, toma su token CSRF y envía el POST). */
+function entrar(Verificador $v, string $correo, string $clave): array
+{
+    $v->olvidarCookies();
+    $form = $v->pedir('/entrar.php');
+    return $v->pedir('/entrar.php', 'POST', ['csrf' => token($form), 'correo' => $correo, 'clave' => $clave]);
+}
+function json(array $respuesta): mixed { return json_decode($respuesta['cuerpo'], true); }
+function cabecera(array $respuesta, string $nombre): ?string
+{
+    return preg_match('/^' . preg_quote($nombre, '/') . ':\s*(.+?)\r?$/mi', $respuesta['cabeceras'], $m) === 1 ? trim($m[1]) : null;
+}
 function borrar_carpeta(string $dir): void
 {
     $items = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
@@ -46,10 +60,16 @@ $socios = new SocioRepositorio($pdo);
 $categorias = (new CategoriaRepositorio($pdo))->todas();
 
 echo '— Base de datos (Laboratorio 8) —' . PHP_EOL;
-$v->revisar('El script SQL crea 5 tablas InnoDB con 4 claves foráneas', function () use ($pdo) {
+$v->revisar('Las 5 tablas de la actividad 2 son InnoDB y tienen sus 4 claves foráneas', function () use ($pdo) {
+    $lista = "'socios', 'categorias', 'tallas', 'productos', 'producto_tallas'";
+    $t = $pdo->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND ENGINE = 'InnoDB' AND TABLE_NAME IN ($lista)")->fetchColumn();
+    $fk = $pdo->query("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME IN ($lista)")->fetchColumn();
+    return (int) $t === 5 && (int) $fk === 4;
+});
+$v->revisar('El esquema completo: 13 tablas InnoDB (actividades 2-4 y trabajo final) con 18 claves foráneas', function () use ($pdo) {
     $t = $pdo->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND ENGINE = 'InnoDB'")->fetchColumn();
     $fk = $pdo->query('SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE()')->fetchColumn();
-    return (int) $t === 5 && (int) $fk === 4;
+    return (int) $t === 13 && (int) $fk === 18;
 });
 $v->revisar('Datos de ejemplo: 14 prendas, 6 socios, 5 categorías, 7 tallas, 34 tallas asignadas', fn() =>
     contar('productos') === 14 && contar('socios') === 6 && contar('categorias') === 5 && contar('tallas') === 7 && contar('producto_tallas') === 34);
@@ -220,9 +240,9 @@ $v->revisar('Un nombre con SQL se guarda como texto literal, sin ejecutarse', fu
 });
 $v->revisar("existeCi(\"' OR ''='\") es falso (el CI malicioso no coincide con nadie)", fn() => !$socios->existeCi("' OR ''='"));
 $v->revisar('Ningún archivo de src/ concatena variables de PHP dentro de un SQL con datos del usuario', function () {
-    foreach (glob(__DIR__ . '/src/Repositorio/*.php') as $archivo) {
-        // Busca prepare("...$variable...") o query("...$variable...") con variables que NO sean las listas blancas permitidas
-        if (preg_match('/->(prepare|query|exec)\(\s*"[^"]*\$(?!donde\b|ordenSql\b)\w+/', (string) file_get_contents($archivo)) === 1) {
+    foreach ([...glob(__DIR__ . '/src/*.php'), ...glob(__DIR__ . '/src/Repositorio/*.php')] as $archivo) {
+        // Busca prepare("...$variable...") o query("...$variable...") con variables que NO sean los fragmentos fijos permitidos
+        if (preg_match('/->(prepare|query|exec)\(\s*"[^"]*\$(?!donde\b|ordenSql\b|filtro\b|lista\b)\w+/', (string) file_get_contents($archivo)) === 1) {
             return false;
         }
     }
@@ -243,7 +263,10 @@ $base = ['codigo' => 'VES-200', 'nombre' => 'Vestido de lino bordado', 'categori
 $socioBase = ['ci' => '5556667', 'nombre' => 'Teresa Supepí Chuvé', 'telefono' => '77712345', 'comunidad' => 'Lomerío',
     'especialidad' => 'Bordado', 'fecha_ingreso' => '2025-03-01', 'activo' => '1'];
 
-$v->servidor(__DIR__ . '/public', null, ['TIENDA_DATOS' => $datos, 'TIENDA_BD_NOMBRE' => BD_PRUEBAS]);
+$v->servidor(__DIR__ . '/public', __DIR__ . '/public/enrutador.php', ['TIENDA_DATOS' => $datos, 'TIENDA_BD_NOMBRE' => BD_PRUEBAS]);
+$v->revisar('Sin sesión, la gestión de prendas redirige a iniciar sesión', fn() =>
+    $v->pedir('/admin.php')['estado'] === 303 && str_contains($v->pedir('/nuevo.php')['cabeceras'], 'Location: /entrar.php?volver='));
+entrar($v, 'admin@manosdeloriente.bo', 'Manos-Admin-2026!');
 
 $inicio = $v->pedir('/');
 $v->revisar('La tienda pagina de 8 en 8: página 1 con 8 prendas, página 2 con 6', fn() =>
@@ -367,6 +390,10 @@ $v->revisar('Formulario: un nombre con SQL se guarda literal y se muestra escapa
         && str_contains($v->pedir('/admin.php?q=INY')['cuerpo'], 'Polera&#039;); DROP TABLE socios;-- &lt;script&gt;');
 });
 
+require __DIR__ . '/pruebas/actividad3.php';
+require __DIR__ . '/pruebas/actividad4.php';
+require __DIR__ . '/pruebas/trabajo_final.php';
+
 echo PHP_EOL . '— Configuración protegida y errores —' . PHP_EOL;
 $v->revisar('El código, la configuración y el SQL no se pueden descargar por URL (solo public/ es accesible)', function () use ($v) {
     foreach (['/../config/config.ejemplo.php', '/config/config.ejemplo.php', '/../src/Conexion.php', '/../bd/esquema.sql'] as $ruta) {
@@ -377,7 +404,7 @@ $v->revisar('El código, la configuración y el SQL no se pueden descargar por U
     }
     return true;
 });
-$v->servidor(__DIR__ . '/public', null, ['TIENDA_DATOS' => $datos, 'TIENDA_BD_NOMBRE' => 'base_que_no_existe']);
+$v->servidor(__DIR__ . '/public', __DIR__ . '/public/enrutador.php', ['TIENDA_DATOS' => $datos, 'TIENDA_BD_NOMBRE' => 'base_que_no_existe']);
 $caida = $v->pedir('/');
 $v->revisar('Si la base de datos no responde: 503 con un mensaje genérico (sin SQLSTATE, rutas ni credenciales)', fn() =>
     $caida['estado'] === 503 && str_contains($caida['cuerpo'], 'ocurrió un problema')

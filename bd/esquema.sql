@@ -1,9 +1,18 @@
 -- bd/esquema.sql — Esquema de la tienda «Manos del Oriente» (MySQL 8 / MariaDB 10.4+).
 -- Se ejecuta sobre la base de datos ya seleccionada: php bd/instalar.php
--- Borra y vuelve a crear las tablas (orden inverso a las claves foráneas).
+-- Borra y vuelve a crear TODAS las tablas (también las de las actividades 3, 4 y del trabajo final).
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS pagos_socios;
+DROP TABLE IF EXISTS acopios;
+DROP TABLE IF EXISTS pedido_detalle;
+DROP TABLE IF EXISTS pedidos;
+DROP TABLE IF EXISTS venta_detalle;
+DROP TABLE IF EXISTS ventas;
+DROP TABLE IF EXISTS tokens_api;
+DROP TABLE IF EXISTS usuarios;
+DROP TABLE IF EXISTS liquidaciones;
 DROP TABLE IF EXISTS producto_tallas;
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS tallas;

@@ -20,6 +20,7 @@ final readonly class Producto
         public string $descripcion = '',
         public ?string $foto = null,
         public ?int $id = null,
+        public int $reservado = 0,
     ) {
         // Reglas que SIEMPRE deben cumplirse, venga de un formulario, de la base de datos o de una prueba
         if (preg_match(self::PATRON_CODIGO, $codigo) !== 1) {
@@ -34,6 +35,9 @@ final readonly class Producto
         if ($stock < 0) {
             throw new InvalidArgumentException('El stock no puede ser negativo.');
         }
+        if ($reservado < 0 || $reservado > $stock) {
+            throw new InvalidArgumentException('Lo reservado por pedidos no puede superar el stock.');
+        }
         if ($tallas === [] || array_filter($tallas, fn(mixed $t): bool => !$t instanceof Talla) !== []) {
             throw new InvalidArgumentException('Indica al menos una talla válida.');
         }
@@ -42,6 +46,12 @@ final readonly class Producto
     public function disponible(): bool
     {
         return $this->stock > 0;
+    }
+
+    /** Unidades que se pueden vender o reservar ahora: el stock menos lo apartado por pedidos (trabajo final). */
+    public function libre(): int
+    {
+        return $this->stock - $this->reservado;
     }
 
     public function tieneTalla(Talla $talla): bool
@@ -81,10 +91,11 @@ final readonly class Producto
             descripcion: $descripcion ?? $this->descripcion,
             foto: $quitarFoto ? null : ($foto ?? $this->foto),
             id: $id ?? $this->id,
+            reservado: $this->reservado,
         );
     }
 
-    /** @return array<string, mixed> representación simple (la usará la API REST de la actividad 4) */
+    /** @return array<string, mixed> representación simple  */
     public function aArreglo(): array
     {
         return [
@@ -95,6 +106,7 @@ final readonly class Producto
             'socio_id' => $this->socio->id,
             'precio' => $this->precio,
             'stock' => $this->stock,
+            'reservado' => $this->reservado,
             'tallas' => array_map(fn(Talla $t): string => $t->value, $this->tallas),
             'color' => $this->color,
             'descripcion' => $this->descripcion,

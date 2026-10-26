@@ -2,6 +2,7 @@
 // public/nuevo.php — Registrar una prenda: GET muestra el formulario; POST valida, guarda en MySQL y redirige (PRG).
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
+exigir_usuario('productos.crear');
 
 $pdo = Conexion::obtener();
 $repo = new ProductoRepositorio($pdo);

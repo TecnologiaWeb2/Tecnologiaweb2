@@ -1,0 +1,14 @@
+.git
+.gitignore
+.dockerignore
+config/config.php
+dist
+laboratorios
+fotosdeaprendas
+datos/productos.json
+docs/*
+!docs/openapi.yaml
+*.docx
+*.pdf
+*.pptx
+*.mp4

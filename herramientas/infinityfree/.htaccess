@@ -1,0 +1,25 @@
+# .htaccess de la RAÍZ de htdocs en InfinityFree (lo copia herramientas/empaquetar_infinityfree.php).
+# El proyecto se sube completo a htdocs/, pero SOLO public/ es visible: todo lo demás responde 403.
+Options -Indexes
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Forzar HTTPS (activar después de instalar el certificado gratuito en el panel de InfinityFree)
+    # RewriteCond %{HTTPS} !=on
+    # RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # Código, configuración, SQL, plantillas, fotos y documentos: nunca por URL
+    # (/datos/catalogo.json y /datos/catalogo.xml SÍ son públicas: las atiende public/; se protege datos/fotos)
+    RewriteRule ^(src|config|bd|plantillas|datos/fotos|docs|pruebas|herramientas|laboratorios)(/|$) - [F,L]
+    RewriteRule ^(verificar|Verificador|auditar)\.php$ - [F,L]
+    RewriteRule (^|/)\. - [F,L]
+    RewriteCond %{REQUEST_URI} !^/api/v1/openapi\.yaml$
+    RewriteRule \.(sql|md|ya?ml|log|bak|zip|ini|lock|dist)$ - [F,L]
+
+    # Todo lo demás se atiende desde public/ (allí, public/.htaccess enruta la API y el intercambio de datos)
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

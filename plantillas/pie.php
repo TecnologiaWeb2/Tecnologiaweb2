@@ -7,7 +7,8 @@ if (es_parcial()) {
 ?>
 </main>
 <footer class="pie py-4 mt-auto">
-  <div class="container text-center small"><?= e(NOMBRE_ASOCIACION) ?> · Tecnología Web II · UPDS</div>
+  <div class="container text-center small"><?= e(NOMBRE_ASOCIACION) ?> · Tecnología Web II · UPDS ·
+    <a href="/datos/catalogo.json">JSON</a> · <a href="/datos/catalogo.xml">XML</a> · <a href="/noticias.rss">RSS</a> · <a href="/api/v1/openapi.yaml">API</a></div>
 </footer>
 
 <!-- Avisos en la esquina superior derecha (registrado, actualizado, eliminado, errores) -->
@@ -54,5 +55,6 @@ if (es_parcial()) {
 
 <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
 <script src="/js/app.js"></script>
+<script type="module" src="/js/validacion-producto.js"></script>
 </body>
 </html>

@@ -45,11 +45,12 @@ require __DIR__ . '/../plantillas/cabecera.php';
   </div>
 </section>
 
-<form method="get" action="/" class="filtros card card-body shadow-sm border-0 mb-4" role="search">
+<form method="get" action="/" class="filtros card card-body shadow-sm border-0 mb-4" role="search" id="filtros-catalogo">
   <div class="row g-2 align-items-end">
     <div class="col-md-4 col-lg-3">
       <label class="form-label small text-secondary mb-1" for="q">Buscar</label>
-      <div class="input-group"><span class="input-group-text bg-white"><i class="bi bi-search"></i></span><input id="q" name="q" type="search" class="form-control" value="<?= e($q) ?>" placeholder="jean, bordado, azul…" maxlength="60"></div>
+      <div class="input-group"><span class="input-group-text bg-white"><i class="bi bi-search"></i></span><input id="q" name="q" type="search" class="form-control" value="<?= e($q) ?>" placeholder="jean, bordado, azul…" maxlength="60" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugerencias" aria-expanded="false"><ul id="sugerencias" class="list-group position-absolute d-none shadow" role="listbox" aria-label="Sugerencias"></ul></div>
+      <p id="estado-sugerencias" class="visually-hidden" aria-live="polite"></p>
     </div>
     <div class="col-6 col-md-4 col-lg-2">
       <label class="form-label small text-secondary mb-1" for="categoria">Categoría</label>
@@ -87,15 +88,19 @@ require __DIR__ . '/../plantillas/cabecera.php';
   </div>
 </form>
 
-<p class="resumen text-secondary" role="status" id="catalogo">
+<div class="row g-4">
+<div class="col-lg-9">
+<p class="resumen text-secondary" role="status" aria-live="polite" id="catalogo">
   <?= $resultado->total ?> <?= $resultado->total === 1 ? 'prenda' : 'prendas' ?><?= $q !== '' ? ' para «' . e($q) . '»' : '' ?>
   <?php if ($resultado->paginas() > 1): ?> · mostrando <?= $resultado->desde() ?>–<?= $resultado->hasta() ?><?php endif; ?>
 </p>
 
+<div id="catalogo-error" class="alert alert-danger d-none" role="alert"></div>
+<div id="grilla-contenido" aria-busy="false">
 <?php if ($resultado->elementos === []): ?>
   <div class="vacio text-center p-5 bg-white rounded-4 shadow-sm"><i class="bi bi-bag-x fs-1 text-secondary"></i><p class="mt-2 mb-0">No encontramos prendas con esos filtros.</p></div>
 <?php else: ?>
-<ul class="grilla row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4 list-unstyled">
+<ul class="grilla row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3 g-md-4 list-unstyled">
   <?php foreach ($resultado->elementos as $p): ?>
     <li class="tarjeta col<?= $p->disponible() ? '' : ' agotado' ?>">
       <article class="card h-100 border-0 shadow-sm">
@@ -122,4 +127,15 @@ require __DIR__ . '/../plantillas/cabecera.php';
 </ul>
 <?php endif; ?>
 <?= paginacion($resultado, '/', $filtros) ?>
+</div>
+</div>
+<aside class="col-lg-3" aria-labelledby="titulo-novedades">
+  <div class="card border-0 shadow-sm"><div class="card-body">
+    <h2 class="h6" id="titulo-novedades"><i class="bi bi-rss me-1"></i>Recién llegadas</h2>
+    <ul id="novedades" class="list-unstyled small mb-2"><li class="text-secondary">Cargando…</li></ul>
+    <a class="small" href="/noticias.rss">Suscribirse al canal RSS</a>
+  </div></div>
+</aside>
+</div>
+<script type="module" src="/js/catalogo.js"></script>
 <?php require __DIR__ . '/../plantillas/pie.php'; ?>

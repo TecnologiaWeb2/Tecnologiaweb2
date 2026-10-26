@@ -2,6 +2,7 @@
 // public/admin.php — Gestión de prendas: tabla paginada con búsqueda, acciones de editar/eliminar y resumen del inventario.
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
+$usuario = exigir_usuario('productos.ver');
 
 const POR_PAGINA = 10;
 $repo = new ProductoRepositorio(Conexion::obtener());
@@ -20,6 +21,9 @@ $mensajes = array_filter(
 
 foreach ($mensajes as $clave => $verbo) {
     avisar('Prenda ' . texto($_GET, $clave) . " $verbo.");
+}
+if (texto($_GET, 'error') !== '') {
+    avisar(mb_substr(texto($_GET, 'error'), 0, 200), 'error');
 }
 
 $titulo = 'Gestión de prendas';
@@ -57,14 +61,16 @@ require __DIR__ . '/../plantillas/cabecera.php';
           <td><?= e($p->socio->nombre) ?></td>
           <td class="small"><?= e($p->tallasTexto(', ')) ?></td>
           <td class="text-end text-nowrap"><?= bs($p->precio) ?></td>
-          <td class="text-end"><?= $p->disponible() ? $p->stock : '<span class="badge text-bg-danger">Agotado</span>' ?></td>
+          <td class="text-end"><?= $p->disponible() ? $p->stock : '<span class="badge text-bg-danger">Agotado</span>' ?><?php if ($p->reservado > 0): ?><br><span class="small text-secondary" title="Reservadas por pedidos"><?= $p->reservado ?> reserv.</span><?php endif; ?></td>
           <td class="text-end text-nowrap acciones">
             <a class="btn btn-sm btn-outline-secondary" href="/editar.php?codigo=<?= urlencode($p->codigo) ?>" data-modal data-titulo="Editar <?= e($p->codigo) ?>" title="Editar"><i class="bi bi-pencil"></i><span class="visually-hidden">Editar</span></a>
+            <?php if ($usuario->puede('productos.eliminar')): ?>
             <form method="post" action="/eliminar.php" class="d-inline" data-confirmar="Se eliminará «<?= e($p->nombre) ?>» (<?= e($p->codigo) ?>) y su foto. Esta acción no se puede deshacer." data-confirmar-titulo="¿Eliminar esta prenda?">
               <?= csrf_campo() ?>
               <input type="hidden" name="codigo" value="<?= e($p->codigo) ?>">
               <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash3"></i><span class="visually-hidden">Eliminar</span></button>
             </form>
+            <?php endif; ?>
           </td>
         </tr>
       <?php endforeach; ?>

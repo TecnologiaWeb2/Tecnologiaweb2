@@ -1,0 +1,40 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: actividad2_app
+    ports:
+      - "8000:80"
+    environment:
+      BD_HOST: db
+      BD_PUERTO: 3306
+      BD_NOMBRE: manos_del_oriente
+      BD_USUARIO: tienda
+      BD_CLAVE: tienda_dev
+      TIENDA_DATOS: /var/www/html/datos
+    volumes:
+      - ./datos:/var/www/html/datos
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.11
+    container_name: actividad2_db
+    environment:
+      MARIADB_DATABASE: manos_del_oriente
+      MARIADB_USER: tienda
+      MARIADB_PASSWORD: tienda_dev
+      MARIADB_ROOT_PASSWORD: root_dev
+    volumes:
+      - actividad2_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -proot_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  actividad2_db:

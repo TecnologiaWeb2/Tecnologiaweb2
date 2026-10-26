@@ -54,3 +54,21 @@ INSERT INTO producto_tallas (producto_id, talla) VALUES
 
 ALTER TABLE socios AUTO_INCREMENT = 7;
 ALTER TABLE productos AUTO_INCREMENT = 15;
+
+-- Fotos de demostración (bd/fotos-demo → datos/fotos). Cada prenda con SU foto (comprobado contra fotosdeaprendas/).
+UPDATE productos SET foto = CASE codigo
+    WHEN 'POL-001' THEN '3b30b0217fe14d2d17a5a738.jpg'
+    WHEN 'POL-002' THEN 'e1ef85fc5a5aab80ef9e389b.jpg'
+    WHEN 'POL-003' THEN '3f0205cc7e042ff7b20a622b.jpg'
+    WHEN 'PAN-010' THEN 'c25df09316ea014c138b8fdf.jpg'
+    WHEN 'PAN-011' THEN 'a489ee4999bda012fb79c218.jpg'
+    WHEN 'PAN-012' THEN '38b37dd54b8cc4a1a287b439.jpg'
+    WHEN 'VES-100' THEN '0317c499d7d98e46aa8c55e4.jpg'
+    WHEN 'VES-101' THEN 'bd18a3938b1c6b43bba05b49.jpg'
+    WHEN 'ABR-200' THEN '3726a242b0cd30e10064af01.jpg'
+    WHEN 'ABR-201' THEN 'c8acbd53ecf0c33696dbc546.jpg'
+    WHEN 'ABR-202' THEN '81d2335d95b4482f4cde5638.jpg'
+    WHEN 'ACC-300' THEN 'afac68acd18549d1a1610890.jpg'
+    WHEN 'ACC-301' THEN 'dd1b25cb066904bac92ef488.jpg'
+    WHEN 'ACC-302' THEN '8a54925f01f1cc02ad28b3a7.jpg'
+END;

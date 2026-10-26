@@ -99,6 +99,8 @@ h1, h2, .h1, .h2, .h3, .display-6, .navbar-brand, .modal-title { font-family: "P
 .sin-foto.mini { width: 48px; height: 48px; border-radius: .75rem; font-size: 1.3rem; }
 .miniatura { object-fit: cover; }
 .foto-detalle { aspect-ratio: 1; object-fit: cover; }
+#sugerencias { z-index: 20; top: 100%; left: 0; right: 0; }
+.input-group { position: relative; }
 
 /* ---------- Insignias suaves ---------- */
 .badge { font-weight: 500; }

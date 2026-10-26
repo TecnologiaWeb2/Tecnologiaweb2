@@ -101,7 +101,7 @@ final class SocioRepositorio
             return $consulta->rowCount() === 1;
         } catch (PDOException $e) {
             if (($e->errorInfo[1] ?? 0) === 1451) {          // ER_ROW_IS_REFERENCED: tiene productos
-                throw new DomainException('No se puede eliminar: tiene prendas registradas. Puedes marcarlo como inactivo.');
+                throw new DomainException('No se puede eliminar: tiene prendas, entregas, pagos o un usuario registrados. Puedes marcarlo como inactivo.');
             }
             throw $e;
         }

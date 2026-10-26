@@ -18,12 +18,15 @@ final class Conexion
     public static function crear(array $bd, bool $conBase = true): PDO
     {
         $dsn = "mysql:host={$bd['host']};port={$bd['puerto']};charset=utf8mb4" . ($conBase ? ";dbname={$bd['nombre']}" : '');
-        return new PDO($dsn, $bd['usuario'], $bd['clave'], [
+        $pdo = new PDO($dsn, $bd['usuario'], $bd['clave'], [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,       // todo error SQL lanza PDOException
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             // Consultas preparadas REALES: el servidor recibe la consulta y los datos por separado,
             // así un dato nunca se interpreta como SQL (con emulación, PDO arma el texto en PHP)
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
+        // NOW() y CURRENT_TIMESTAMP en la hora de Bolivia, aunque el servidor del hosting esté en otro huso
+        $pdo->exec("SET time_zone = '-04:00'");
+        return $pdo;
     }
 }

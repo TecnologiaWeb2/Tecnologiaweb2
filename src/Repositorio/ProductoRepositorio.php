@@ -6,10 +6,12 @@ declare(strict_types=1);
 
 final class ProductoRepositorio
 {
-    public const ORDENES = ['nombre' => 'Nombre (A-Z)', 'precio-asc' => 'Precio: menor a mayor', 'precio-desc' => 'Precio: mayor a menor'];
-    private const SQL_ORDEN = ['nombre' => 'p.nombre, p.codigo', 'precio-asc' => 'p.precio, p.codigo', 'precio-desc' => 'p.precio DESC, p.codigo'];
+    public const ORDENES = ['nombre' => 'Nombre (A-Z)', 'precio-asc' => 'Precio: menor a mayor', 'precio-desc' => 'Precio: mayor a menor',
+        'stock' => 'Más stock primero'];
+    private const SQL_ORDEN = ['nombre' => 'p.nombre, p.codigo', 'precio-asc' => 'p.precio, p.codigo', 'precio-desc' => 'p.precio DESC, p.codigo',
+        'stock' => 'p.stock DESC, p.codigo'];
 
-    private const SELECT = 'SELECT p.id, p.codigo, p.nombre, p.precio, p.stock, p.color, p.descripcion, p.foto,
+    private const SELECT = 'SELECT p.id, p.codigo, p.nombre, p.precio, p.stock, p.reservado, p.color, p.descripcion, p.foto,
             c.id AS c_id, c.nombre AS c_nombre, c.descripcion AS c_descripcion,
             s.id AS s_id, s.ci AS s_ci, s.nombre AS s_nombre, s.telefono AS s_telefono, s.comunidad AS s_comunidad,
             s.especialidad AS s_especialidad, s.fecha_ingreso AS s_fecha_ingreso, s.activo AS s_activo,
@@ -122,12 +124,22 @@ final class ProductoRepositorio
         });
     }
 
-    /** Borra la prenda (sus tallas se borran en cascada) y la devuelve para que quien llama borre su foto. */
+    /**
+     * Borra la prenda (sus tallas se borran en cascada) y la devuelve para que quien llama borre su foto.
+     * Si ya tiene movimientos, la clave foránea lo impide (el historial de ventas no se pierde) → DomainException.
+     */
     public function eliminar(string $codigo): ?Producto
     {
         $producto = $this->buscarPorCodigo($codigo);
         if ($producto !== null) {
-            $this->pdo->prepare('DELETE FROM productos WHERE id = :id')->execute(['id' => $producto->id]);
+            try {
+                $this->pdo->prepare('DELETE FROM productos WHERE id = :id')->execute(['id' => $producto->id]);
+            } catch (PDOException $e) {
+                if (($e->errorInfo[1] ?? 0) === 1451) {      // ER_ROW_IS_REFERENCED: tiene ventas, acopios o pedidos
+                    throw new DomainException("No se puede eliminar {$codigo}: tiene ventas, acopios o pedidos registrados. Puedes dejar su stock en 0.");
+                }
+                throw $e;
+            }
         }
         return $producto;
     }
@@ -201,6 +213,7 @@ final class ProductoRepositorio
             descripcion: $f['descripcion'],
             foto: $f['foto'],
             id: (int) $f['id'],
+            reservado: (int) ($f['reservado'] ?? 0),
         );
     }
 }

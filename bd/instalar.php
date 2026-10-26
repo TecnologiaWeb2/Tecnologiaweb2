@@ -7,6 +7,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../src/Conexion.php';
 
+/** Orden de ejecución: actividad 2 (esquema, datos), actividad 3 (04, 05), actividad 4 (06) y trabajo final (07, 08). */
+const SCRIPTS_SQL = ['esquema.sql', 'datos.sql', '04-usuarios.sql', '05-movimientos.sql', '06-tokens.sql', '07-tfi.sql', '08-demo.sql'];
+
 /** Crea/recrea la base indicada en la configuración y ejecuta los scripts SQL. Devuelve el nombre de la base. */
 function instalar_bd(bool $conDatos = true): string
 {
@@ -17,13 +20,27 @@ function instalar_bd(bool $conDatos = true): string
     $servidor = Conexion::crear($bd, conBase: false);
     $servidor->exec("CREATE DATABASE IF NOT EXISTS `{$bd['nombre']}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     $pdo = Conexion::crear($bd);
-    $scripts = $conDatos ? ['esquema.sql', 'datos.sql'] : ['esquema.sql'];
-    foreach ($scripts as $script) {
+    foreach ($conDatos ? SCRIPTS_SQL : ['esquema.sql'] as $script) {
         foreach (dividir_sql((string) file_get_contents(__DIR__ . "/$script")) as $sentencia) {
             $pdo->exec($sentencia);
         }
     }
     return $bd['nombre'];
+}
+
+/** Copia las 14 fotos de demostración (bd/fotos-demo) a la carpeta de fotos, sin pisar las que ya existen. */
+function copiar_fotos_demo(string $destino = CARPETA_FOTOS): int
+{
+    if (!is_dir($destino)) {
+        mkdir($destino, 0775, true);
+    }
+    $copiadas = 0;
+    foreach (glob(__DIR__ . '/fotos-demo/*.{jpg,png,webp}', GLOB_BRACE) ?: [] as $foto) {
+        if (!is_file($destino . '/' . basename($foto)) && copy($foto, $destino . '/' . basename($foto))) {
+            $copiadas++;
+        }
+    }
+    return $copiadas;
 }
 
 /** Separa un script en sentencias (por ';' al final de línea), ignorando los comentarios "-- ". @return list<string> */
@@ -35,5 +52,6 @@ function dividir_sql(string $sql): array
 
 if (PHP_SAPI === 'cli' && realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
     $nombre = instalar_bd();
-    echo "Base de datos «{$nombre}» instalada con los datos de demostración." . PHP_EOL;
+    $fotos = copiar_fotos_demo();
+    echo "Base de datos «{$nombre}» instalada con los datos de demostración ({$fotos} fotos copiadas)." . PHP_EOL;
 }

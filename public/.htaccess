@@ -1,0 +1,21 @@
+# public/.htaccess — Apache / InfinityFree: rutas de la API y del intercambio de datos (lo mismo que enrutador.php).
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Algunos hostings no pasan la cabecera Authorization a PHP: se copia para que llegue el "Bearer mdo_…"
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    RewriteRule ^api/v1(/.*)?$ api.php [QSA,L]
+    RewriteRule ^datos/catalogo\.json$ catalogo.json.php [QSA,L]
+    RewriteRule ^datos/catalogo\.xml$ catalogo.xml.php [QSA,L]
+    RewriteRule ^datos/productos/([A-Za-z0-9-]{1,12})$ producto-api.php?codigo=$1 [QSA,L]
+    RewriteRule ^noticias\.rss$ noticias.rss.php [QSA,L]
+    RewriteRule ^enrutador\.php$ - [F,L]
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

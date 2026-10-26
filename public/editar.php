@@ -2,6 +2,7 @@
 // public/editar.php?codigo=POL-001 — Editar una prenda; si llega una foto nueva, reemplaza a la anterior.
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
+exigir_usuario('productos.editar');
 
 $pdo = Conexion::obtener();
 $repo = new ProductoRepositorio($pdo);
@@ -27,6 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errores = $resultado['errores'];
     if ($foto['error'] !== null) {
         $errores['foto'] = $foto['error'];
+    }
+    if ($errores === [] && $resultado['producto']->stock < $actual->reservado) {
+        $errores['stock'] = "Hay {$actual->reservado} unidades reservadas por pedidos: el stock no puede ser menor.";
     }
     if ($errores === []) {
         $repo->actualizar($resultado['producto']);

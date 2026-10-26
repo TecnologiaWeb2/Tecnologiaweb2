@@ -1,5 +1,5 @@
 <?php
-// src/funciones.php — Funciones de ayuda para las vistas: escapar HTML, dinero, mensajes y token CSRF.
+// src/funciones.php — Funciones de ayuda para las vistas: escapar HTML, dinero, mensajes y paginación.
 declare(strict_types=1);
 
 /** Escapa texto para insertarlo en HTML (evita XSS). */
@@ -40,44 +40,14 @@ function redirigir(string $url): never
     exit;
 }
 
-// ---------- Protección CSRF ----------
-
-function iniciar_sesion(): void
-{
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'use_strict_mode' => true]);
-    }
-}
-
-function csrf_token(): string
-{
-    iniciar_sesion();
-    return $_SESSION['csrf'] ??= bin2hex(random_bytes(32));
-}
-
-function csrf_campo(): string
-{
-    return '<input type="hidden" name="csrf" value="' . e(csrf_token()) . '">';
-}
-
-/** Si el token del formulario no coincide con el de la sesión, responde 403 y termina. */
-function exigir_csrf(array $entrada): void
-{
-    iniciar_sesion();
-    $enviado = $entrada['csrf'] ?? '';
-    if (!is_string($enviado) || !isset($_SESSION['csrf']) || !hash_equals($_SESSION['csrf'], $enviado)) {
-        http_response_code(403);
-        exit('Solicitud rechazada: el formulario expiró o no proviene de este sitio (CSRF).');
-    }
-}
+// La sesión y el token CSRF viven en src/Seguridad.php (actividad 3).
 
 /** Solo permite los métodos indicados; si no, responde 405 con la cabecera Allow. */
 function exigir_metodo(string ...$permitidos): void
 {
     if (!in_array($_SERVER['REQUEST_METHOD'], $permitidos, true)) {
-        http_response_code(405);
         header('Allow: ' . implode(', ', $permitidos));
-        exit('Método no permitido');
+        responder_error(405, 'Método no permitido', 'Esta dirección solo acepta ' . implode(', ', $permitidos) . '.');
     }
 }
 
@@ -103,4 +73,39 @@ function paginacion(Pagina $p, string $ruta, array $parametros = []): string
     }
     $html .= $p->haySiguiente() ? '<li class="page-item"><a class="page-link" href="' . $url($p->pagina + 1) . '" rel="next">Siguiente →</a></li>' : '';
     return $html . '</ul></nav>';
+}
+
+/** Fecha y hora de MySQL ("2026-07-05 10:30:00") en formato boliviano: "05/07/2026 10:30". */
+function fecha_bo(string $fechaMysql, bool $conHora = true): string
+{
+    $fecha = new DateTimeImmutable($fechaMysql);
+    return $fecha->format($conHora ? 'd/m/Y H:i' : 'd/m/Y');
+}
+
+/** Número con coma decimal boliviana ("45,50") o con punto ("45.50") → float; null si no es un número. */
+function numero_bo(string $texto): ?float
+{
+    $texto = trim($texto);
+    if (str_contains($texto, ',')) {
+        $texto = str_replace(['.', ','], ['', '.'], $texto);
+    }
+    $valor = filter_var($texto, FILTER_VALIDATE_FLOAT);
+    return $valor === false ? null : (float) $valor;
+}
+
+/** Líneas de un formulario con codigo[] y cantidad[] → ['POL-001' => 3, …] (las vacías se ignoran, los repetidos se suman). */
+function lineas_formulario(array $entrada): array
+{
+    $lineas = [];
+    $codigos = is_array($entrada['codigo'] ?? null) ? $entrada['codigo'] : [];
+    $cantidades = is_array($entrada['cantidad'] ?? null) ? $entrada['cantidad'] : [];
+    foreach ($codigos as $i => $codigo) {
+        $codigo = is_string($codigo) ? strtoupper(trim($codigo)) : '';
+        if ($codigo === '') {
+            continue;
+        }
+        $cantidad = filter_var($cantidades[$i] ?? '', FILTER_VALIDATE_INT);
+        $lineas[$codigo] = ($lineas[$codigo] ?? 0) + ($cantidad === false ? 0 : $cantidad);
+    }
+    return $lineas;
 }

@@ -15,3 +15,15 @@ Thumbs.db
 
 # Configuración local del editor
 *.code-workspace
+
+# Paquete para InfinityFree (lleva config.php con la clave del hosting y CREDENCIALES.txt): se genera, no se sube
+dist/
+
+# Fotos originales sin procesar (las de demostración están en bd/fotos-demo)
+fotosdeaprendas/
+
+# Dependencias de los laboratorios (se instalan con composer / npm)
+laboratorios/*/vendor/
+laboratorios/*/node_modules/
+laboratorios/*/ejemplos/tokens.txt
+.env

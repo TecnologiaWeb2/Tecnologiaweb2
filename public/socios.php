@@ -2,6 +2,7 @@
 // public/socios.php — Listado paginado de socios con búsqueda, filtro de estado y cantidad de prendas de cada uno.
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
+$usuario = exigir_usuario('socios.ver');
 
 const POR_PAGINA = 5;
 $q = texto($_GET, 'q');
@@ -76,11 +77,13 @@ require __DIR__ . '/../plantillas/cabecera.php';
           <td><?= $s->activo ? '<span class="badge text-bg-success">Activo</span>' : '<span class="badge text-bg-secondary">Inactivo</span>' ?></td>
           <td class="text-end text-nowrap acciones">
             <a class="btn btn-sm btn-outline-secondary" href="/socio_form.php?id=<?= $s->id ?>" data-modal data-titulo="Editar socio" title="Editar"><i class="bi bi-pencil"></i><span class="visually-hidden">Editar</span></a>
+            <?php if ($usuario->puede('socios.eliminar')): ?>
             <form method="post" action="/socio_eliminar.php" class="d-inline" data-confirmar="Se eliminará a <?= e($s->nombre) ?> (CI <?= e($s->ci) ?>). Esta acción no se puede deshacer." data-confirmar-titulo="¿Eliminar este socio?">
               <?= csrf_campo() ?>
               <input type="hidden" name="id" value="<?= $s->id ?>">
               <button type="submit" class="btn btn-sm btn-outline-danger"<?= $prendas > 0 ? ' disabled title="Tiene prendas registradas"' : ' title="Eliminar"' ?>><i class="bi bi-trash3"></i><span class="visually-hidden">Eliminar</span></button>
             </form>
+            <?php endif; ?>
           </td>
         </tr>
       <?php endforeach; ?>

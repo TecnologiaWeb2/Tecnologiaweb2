@@ -3,6 +3,8 @@
 // Las pruebas cambian la carpeta de fotos con TIENDA_DATOS y la base con TIENDA_BD_NOMBRE.
 declare(strict_types=1);
 
+date_default_timezone_set('America/La_Paz');          // Bolivia (UTC−4): fechas de ventas, RSS y tokens
+
 define('DIR_DATOS', rtrim((string) (getenv('TIENDA_DATOS') ?: __DIR__ . '/../datos'), '/\\'));
 const CARPETA_FOTOS = DIR_DATOS . '/fotos';          // FUERA de public/: no se puede ejecutar ni listar
 const TAM_MAXIMO = 2 * 1024 * 1024;                   // 2 MB

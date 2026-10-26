@@ -1,0 +1,405 @@
+openapi: 3.1.0
+info:
+  title: API REST de Manos del Oriente
+  version: 1.0.0
+  summary: Catálogo de prendas, liquidaciones de socias y pedidos de compradores.
+  description: |
+    API de la Asociación de Confeccionistas Textiles «Manos del Oriente» (Tecnología Web II, UPDS).
+
+    * **Lectura pública** del catálogo (`GET /productos…`).
+    * **Escritura con token**: `Authorization: Bearer mdo_…` (se emite en `/tokens.php`, rol administración).
+      En la base solo se guarda el hash SHA-256 del token.
+    * Respuestas en `application/json`; **errores** en `application/problem+json` (RFC 9457).
+    * Precios como **texto** con 2 decimales (`"95.00"`) y fechas en **ISO 8601**.
+    * Un parámetro inválido **no se corrige en silencio**: la API responde 422 y explica cada campo en `errores`.
+  contact:
+    name: Equipo Manos del Oriente
+    url: https://github.com/TecnologiaWeb2/Tecnologiaweb2
+  license:
+    name: Uso académico
+    identifier: CC-BY-4.0
+servers:
+  - url: http://127.0.0.1:8000/api/v1
+    description: Desarrollo local (php -S o Docker)
+  - url: https://manosdeloriente.infinityfreeapp.com/api/v1
+    description: Publicación en InfinityFree (reemplazar por el dominio real)
+tags:
+  - name: Productos
+    description: Catálogo de prendas (Laboratorio 13)
+  - name: Liquidaciones
+    description: Módulo 1 del trabajo final — saldo de cada socia
+  - name: Pedidos
+    description: Módulo 2 del trabajo final — pedidos con reserva de stock
+  - name: Documentación
+paths:
+  /productos:
+    get:
+      tags: [Productos]
+      operationId: listarProductos
+      summary: Listar prendas con filtros, orden y paginación
+      parameters:
+        - { name: pagina, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: por_pagina, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 10 } }
+        - { name: q, in: query, description: Texto en nombre, código o color, schema: { type: string, maxLength: 60 } }
+        - { name: categoria, in: query, schema: { type: string, enum: [abrigos, accesorios, pantalones, poleras, vestidos] } }
+        - { name: talla, in: query, schema: { type: string, enum: [XS, S, M, L, XL, XXL, U] } }
+        - { name: disponibles, in: query, description: 1 = solo con stock, schema: { type: string, enum: ['0', '1'] } }
+        - { name: orden, in: query, schema: { type: string, enum: [nombre, precio-asc, precio-desc, stock], default: nombre } }
+      responses:
+        '200':
+          description: Página de resultados
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ListaProductos' }
+              example:
+                datos:
+                  - codigo: POL-002
+                    nombre: Blusa de tocuyo manga corta
+                    categoria: { id: poleras, nombre: Poleras y blusas }
+                    precio: '120.00'
+                    stock: 0
+                    reservado: 0
+                    disponible: 0
+                    tallas: [XS, S, M]
+                    color: Crudo
+                    descripcion: Tela de tocuyo tradicional, fresca para el calor del oriente.
+                    foto: null
+                    socio: { id: 2, nombre: Elena Masabí Tomichá, comunidad: San Javier }
+                    enlaces: { self: /api/v1/productos/POL-002, web: /producto.php?codigo=POL-002 }
+                meta: { total: 14, pagina: 2, por_pagina: 5, paginas: 3 }
+                enlaces:
+                  self: /api/v1/productos?orden=precio-asc&pagina=2&por_pagina=5
+                  anterior: /api/v1/productos?orden=precio-asc&pagina=1&por_pagina=5
+                  siguiente: /api/v1/productos?orden=precio-asc&pagina=3&por_pagina=5
+        '422': { $ref: '#/components/responses/DatosInvalidos' }
+    post:
+      tags: [Productos]
+      operationId: crearProducto
+      summary: Registrar una prenda
+      security: [{ bearer: [] }]
+      description: Roles administración u operador.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductoEntrada' }
+            example:
+              codigo: POL-050
+              nombre: Polera de lino con bordado de cusi
+              categoria: poleras
+              socio_id: 1
+              precio: '110.00'
+              stock: 6
+              tallas: [S, M, L]
+              color: Blanco
+              descripcion: Lino natural, bordado a mano.
+      responses:
+        '201':
+          description: Creada
+          headers:
+            Location: { description: URL de la prenda nueva, schema: { type: string, example: /api/v1/productos/POL-050 } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/Producto' } } }
+        '400': { $ref: '#/components/responses/JsonInvalido' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+        '415': { $ref: '#/components/responses/TipoNoSoportado' }
+        '422': { $ref: '#/components/responses/DatosInvalidos' }
+    options:
+      tags: [Productos]
+      operationId: preflightProductos
+      summary: Preflight CORS
+      responses:
+        '204':
+          description: Sin cuerpo; cabeceras Access-Control-Allow-Origin, -Methods y -Headers
+  /productos/sugerencias:
+    get:
+      tags: [Productos]
+      operationId: sugerirProductos
+      summary: Hasta 8 coincidencias para el autocompletar
+      description: Debe declararse ANTES de /productos/{codigo} para que «sugerencias» no se tome como un código.
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string, minLength: 2, maxLength: 40 } }
+      responses:
+        '200':
+          description: Sugerencias
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  datos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        codigo: { type: string }
+                        nombre: { type: string }
+                        precio: { $ref: '#/components/schemas/Dinero' }
+              example: { datos: [{ codigo: ABR-201, nombre: Poncho tejido de lana, precio: '310.00' }] }
+        '422': { $ref: '#/components/responses/DatosInvalidos' }
+  /productos/{codigo}:
+    parameters:
+      - { name: codigo, in: path, required: true, schema: { type: string, pattern: '^[A-Za-z]{3}-[A-Za-z0-9]{2,5}$' }, example: POL-001 }
+    get:
+      tags: [Productos]
+      operationId: verProducto
+      summary: Una prenda (con ETag)
+      parameters:
+        - { name: If-None-Match, in: header, schema: { type: string }, description: ETag recibido antes }
+      responses:
+        '200':
+          description: La prenda
+          headers:
+            ETag: { schema: { type: string, example: '"3f9c1d0a7b2e4c5d6e7f"' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/Producto' } } }
+        '304': { description: No cambió desde el ETag enviado (sin cuerpo) }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Productos]
+      operationId: reemplazarProducto
+      summary: Reemplazar la prenda completa (el código de la URL manda)
+      security: [{ bearer: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ProductoEntrada' } } }
+      responses:
+        '200': { description: Actualizada, content: { application/json: { schema: { $ref: '#/components/schemas/Producto' } } } }
+        '400': { $ref: '#/components/responses/JsonInvalido' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '415': { $ref: '#/components/responses/TipoNoSoportado' }
+        '422': { $ref: '#/components/responses/DatosInvalidos' }
+    delete:
+      tags: [Productos]
+      operationId: eliminarProducto
+      summary: Eliminar una prenda (solo administración)
+      security: [{ bearer: [] }]
+      responses:
+        '204': { description: Eliminada (sin cuerpo) }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+  /socios/{id}/liquidacion:
+    get:
+      tags: [Liquidaciones]
+      operationId: verLiquidacion
+      summary: Liquidación de una socia (una socia solo puede pedir la suya)
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 }, example: 2 }
+      responses:
+        '200':
+          description: Saldo y movimientos
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Liquidacion' }
+              example:
+                socio: { id: 2, nombre: Elena Masabí Tomichá, comunidad: San Javier }
+                entregadas: 13
+                aprobadas: 12
+                liquidado: '1065.00'
+                pagado: '585.00'
+                saldo: '480.00'
+                acopios:
+                  - { fecha: '2026-09-01T08:30:00-04:00', codigo: VES-101, entregadas: 3, aprobadas: 3, precio_unitario: '160.00', liquidado: '480.00', observacion: '' }
+                pagos:
+                  - { fecha: '2026-08-10T12:00:00-04:00', importe: '585.00', referencia: REC-0810-02 }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+  /pedidos:
+    get:
+      tags: [Pedidos]
+      operationId: listarPedidos
+      summary: Pedidos (últimos 50)
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: estado, in: query, schema: { type: string, enum: [pendiente, confirmado, entregado, cancelado] } }
+      responses:
+        '200':
+          description: Lista
+          content:
+            application/json:
+              schema: { type: object, properties: { datos: { type: array, items: { $ref: '#/components/schemas/Pedido' } } } }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '422': { $ref: '#/components/responses/DatosInvalidos' }
+    post:
+      tags: [Pedidos]
+      operationId: crearPedido
+      summary: Registrar el pedido de un comprador (reserva el stock)
+      security: [{ bearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PedidoEntrada' }
+            example: { numero: HM-889, cliente: Hotel Misiones, fecha: '2026-10-24', lineas: [{ codigo: ABR-201, cantidad: 1 }, { codigo: ACC-301, cantidad: 3 }] }
+      responses:
+        '201':
+          description: Registrado; las prendas quedan reservadas
+          headers:
+            Location: { schema: { type: string, example: /api/v1/pedidos/4 } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/Pedido' } } }
+        '400': { $ref: '#/components/responses/JsonInvalido' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+        '415': { $ref: '#/components/responses/TipoNoSoportado' }
+        '422': { $ref: '#/components/responses/DatosInvalidos' }
+  /pedidos/{id}:
+    get:
+      tags: [Pedidos]
+      operationId: verPedido
+      summary: Un pedido con sus líneas
+      security: [{ bearer: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      responses:
+        '200': { description: El pedido, content: { application/json: { schema: { $ref: '#/components/schemas/Pedido' } } } }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/Prohibido' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+  /openapi.yaml:
+    get:
+      tags: [Documentación]
+      operationId: contrato
+      summary: Este documento
+      responses:
+        '200': { description: OpenAPI 3.1 en YAML, content: { application/yaml: {} } }
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: mdo_ + 40 hexadecimales
+      description: Token emitido en /tokens.php. Actúa con el rol del usuario al que pertenece.
+  schemas:
+    Dinero:
+      type: string
+      pattern: '^\d+\.\d{2}$'
+      description: Importe en bolivianos como texto (sin errores de redondeo)
+      example: '95.00'
+    Producto:
+      type: object
+      required: [codigo, nombre, categoria, precio, stock, reservado, disponible, tallas, socio]
+      properties:
+        codigo: { type: string, example: POL-001 }
+        nombre: { type: string }
+        categoria: { type: object, properties: { id: { type: string }, nombre: { type: string } } }
+        precio: { $ref: '#/components/schemas/Dinero' }
+        stock: { type: integer, minimum: 0 }
+        reservado: { type: integer, minimum: 0, description: Apartado por pedidos pendientes o confirmados }
+        disponible: { type: integer, minimum: 0, description: stock − reservado }
+        tallas: { type: array, items: { type: string, enum: [XS, S, M, L, XL, XXL, U] } }
+        color: { type: string }
+        descripcion: { type: string }
+        foto: { type: [string, 'null'], example: /foto.php?f=0317c499d7d98e46aa8c55e4.jpg }
+        socio: { type: object, properties: { id: { type: integer }, nombre: { type: string }, comunidad: { type: string } } }
+        enlaces: { type: object, properties: { self: { type: string }, web: { type: string } } }
+    ProductoEntrada:
+      type: object
+      required: [nombre, categoria, socio_id, precio]
+      properties:
+        codigo: { type: string, pattern: '^[A-Z]{3}-[A-Z0-9]{2,5}$', description: Obligatorio en POST; en PUT se ignora }
+        nombre: { type: string, minLength: 3, maxLength: 80 }
+        categoria: { type: string, enum: [abrigos, accesorios, pantalones, poleras, vestidos] }
+        socio_id: { type: integer, description: Socia ACTIVA que confeccionó la prenda }
+        precio: { type: string, description: 'Número entre 0,01 y 100.000 («110.00» o «110,00»)' }
+        stock: { type: integer, minimum: 0, default: 0 }
+        tallas: { type: array, items: { type: string }, default: [U] }
+        color: { type: string, maxLength: 30 }
+        descripcion: { type: string, maxLength: 500 }
+    ListaProductos:
+      type: object
+      properties:
+        datos: { type: array, items: { $ref: '#/components/schemas/Producto' } }
+        meta:
+          type: object
+          properties: { total: { type: integer }, pagina: { type: integer }, por_pagina: { type: integer }, paginas: { type: integer } }
+        enlaces:
+          type: object
+          properties: { self: { type: string }, primera: { type: string }, anterior: { type: string }, siguiente: { type: string }, ultima: { type: string } }
+    Liquidacion:
+      type: object
+      properties:
+        socio: { type: object, properties: { id: { type: integer }, nombre: { type: string }, comunidad: { type: string } } }
+        entregadas: { type: integer }
+        aprobadas: { type: integer }
+        liquidado: { $ref: '#/components/schemas/Dinero' }
+        pagado: { $ref: '#/components/schemas/Dinero' }
+        saldo: { $ref: '#/components/schemas/Dinero' }
+        acopios: { type: array, items: { type: object } }
+        pagos: { type: array, items: { type: object } }
+    PedidoEntrada:
+      type: object
+      required: [numero, cliente, fecha, lineas]
+      properties:
+        numero: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9\-_/]{1,29}$' }
+        cliente: { type: string, minLength: 2, maxLength: 80 }
+        fecha: { type: string, format: date }
+        lineas:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            required: [codigo, cantidad]
+            properties:
+              codigo: { type: string, pattern: '^[A-Z]{3}-[A-Z0-9]{2,5}$' }
+              cantidad: { type: integer, minimum: 1, maximum: 1000 }
+    Pedido:
+      type: object
+      properties:
+        id: { type: integer }
+        numero: { type: string }
+        cliente: { type: string }
+        origen: { type: string, enum: [web, json, xml, api] }
+        estado: { type: string, enum: [pendiente, confirmado, entregado, cancelado] }
+        total: { $ref: '#/components/schemas/Dinero' }
+        creado: { type: string, format: date-time }
+        venta_id: { type: [integer, 'null'] }
+        lineas: { type: array, items: { type: object } }
+        enlaces: { type: object }
+    Problema:
+      type: object
+      description: Problem Details (RFC 9457)
+      required: [type, title, status, detail]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        errores: { type: object, additionalProperties: { type: string }, description: Detalle por campo (solo 422) }
+  responses:
+    JsonInvalido:
+      description: El cuerpo no es un objeto JSON válido
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problema' } } }
+    NoAutenticado:
+      description: Falta el token o no es válido (cabecera WWW-Authenticate)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+          example: { type: 'https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#no-autenticado', title: No autenticado, status: 401, detail: 'Esta operación requiere un token: "Authorization: Bearer mdo_…".', instance: /api/v1/productos }
+    Prohibido:
+      description: El rol del token no permite la operación
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problema' } } }
+    NoEncontrado:
+      description: El recurso no existe
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problema' } } }
+    Conflicto:
+      description: Código o número repetido, o la prenda tiene movimientos
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problema' } } }
+    TipoNoSoportado:
+      description: Falta "Content-Type: application/json"
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problema' } } }
+    DatosInvalidos:
+      description: Uno o más campos o parámetros no son válidos
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+          example: { type: 'https://github.com/TecnologiaWeb2/Tecnologiaweb2/blob/main/docs/actividad-04/endpoints.md#datos-invalidos', title: Datos inválidos, status: 422, detail: Revisa los parámetros indicados en "errores"., instance: /api/v1/productos, errores: { por_pagina: Debe ser un entero entre 1 y 50. } }

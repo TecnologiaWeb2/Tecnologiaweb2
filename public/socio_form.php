@@ -2,6 +2,7 @@
 // public/socio_form.php[?id=3] — Registrar (sin id) o editar (con id) un socio. POST valida, guarda y redirige (PRG).
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
+exigir_usuario('socios.editar');
 
 $repo = new SocioRepositorio(Conexion::obtener());
 $idTexto = texto($_GET, 'id');

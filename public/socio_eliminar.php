@@ -2,6 +2,7 @@
 // public/socio_eliminar.php — Elimina un socio (POST + CSRF). Si tiene prendas, la clave foránea lo impide.
 declare(strict_types=1);
 require __DIR__ . '/../src/arranque.php';
+exigir_usuario('socios.eliminar');
 
 exigir_metodo('POST');
 exigir_csrf($_POST);
